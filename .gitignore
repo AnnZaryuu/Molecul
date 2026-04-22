@@ -1,0 +1,56 @@
+# --- DEPENDENCIES ---
+node_modules/
+.pnp
+.pnp.js
+
+# --- EXPO & METRO ---
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+.metro-health-check*
+
+# --- NATIVE (Android/iOS) ---
+# Karena pakai Expo
+/ios
+/android
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+.kotlin/
+
+# --- BUNDLES ---
+*.bundle
+*.jsbundle
+
+# --- CONFIG & SECRETS (Penting!) ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+
+# --- DEBUG & LOGS ---
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+logs
+*.log
+.eslintcache
+
+# --- IDE & SYSTEM ---
+.DS_Store
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# --- TYPESCRIPT ---
+*.tsbuildinfo
