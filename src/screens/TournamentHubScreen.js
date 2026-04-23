@@ -1,189 +1,294 @@
-import React from 'react';
-import { StyleSheet, Text, View, FlatList, SafeAreaView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, Text, View, FlatList, SafeAreaView, TouchableOpacity, ActivityIndicator, Dimensions, Image, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { PALETTE, SIZES } from '../theme/theme';
-import StandingRow from '../components/StandingRow';
-import MatchCard from '../components/MatchCard';
-import MetaCard from '../components/MetaCard';
+import { MLBBApiService } from '../services/mlbbApiService';
+import { useNavigation } from '@react-navigation/native';
 
-const DUMMY_TEAMS = [
-  { id: '1', rank: '01', name: 'RRQ HOSHI', m: '8 - 1', g: '17 - 4', p: 24, logo: 'https://placehold.co/40/FF4D4D/white?text=RRQ' },
-  { id: '2', rank: '02', name: 'ONIC ESPORTS', m: '7 - 2', g: '15 - 6', p: 21, logo: 'https://placehold.co/40/FFD700/black?text=ONIC' },
-  { id: '3', rank: '03', name: 'BIGETRON ALPHA', m: '6 - 3', g: '14 - 8', p: 18, logo: 'https://placehold.co/40/FF4D4D/white?text=BTR' },
-  { id: '4', rank: '04', name: 'EVOS GLORY', m: '5 - 4', g: '12 - 10', p: 15, logo: 'https://placehold.co/40/4FACFE/white?text=EVOS' },
-  { id: '5', rank: '05', name: 'ALTER EGO', m: '4 - 5', g: '10 - 12', p: 12, logo: 'https://placehold.co/40/000000/white?text=AE' },
+const { width } = Dimensions.get('window');
+
+const REGIONS = [
+  { id: 'ID', name: 'INDONESIA', slug: 'mlbb-mpl-indonesia-17-2026-regular-season', league: 'MPL ID S17' },
+  { id: 'PH', name: 'PHILIPPINES', slug: 'mlbb-mpl-philippines-17-2026-regular-season', league: 'MPL PH S17' },
+  { id: 'MY', name: 'MALAYSIA', slug: 'mlbb-mpl-malaysia-17-2026-regular-season', league: 'MPL MY S17' },
 ];
 
 const TournamentHubScreen = () => {
+  const navigation = useNavigation();
+  const [selectedRegion, setSelectedRegion] = useState(REGIONS[0]);
+  const [metaData, setMetaData] = useState([]);
+  const [nextMatches, setNextMatches] = useState([]);
+  const [standings, setStandings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showRegionModal, setShowRegionModal] = useState(false);
 
-  const renderListHeader = () => (
-    <View>
-      {/* 1. TOP HEADER */}
-      <View style={styles.mainHeader}>
-        <Ionicons name="search-outline" size={24} color={PALETTE.textMain} />
-        <Text style={styles.moleculLogo}>MOLECUL</Text>
-        <View style={styles.profileBox}>
-          <Ionicons name="person" size={18} color="white" />
-        </View>
-      </View>
+  useEffect(() => {
+    fetchData();
+  }, [selectedRegion]);
 
-      {/* 2. LIVE TOURNAMENT BANNER */}
-      <LinearGradient colors={['#1a1a1a', '#000000']} style={styles.bannerCard}>
-        <View style={styles.liveBadge}>
-          <Text style={styles.liveText}>SEASON 12 | LIVE TOURNAMENT</Text>
-        </View>
-        <Text style={styles.bannerTitle}>MPL ID PRO LEAGUE</Text>
-        <Text style={styles.bannerDesc}>The pinnacle of Indonesian Mobile Legends. 9 Teams. One Throne.</Text>
-        <View style={styles.bannerInfoRow}>
-          <View><Text style={styles.infoLabel}>PRIZE POOL</Text><Text style={styles.infoValue}>$300,000</Text></View>
-          <View>
-            <Text style={styles.infoLabel}>STATUS</Text>
-            <Text style={[styles.infoValue, { color: PALETTE.blueInfo }]}>GROUP STAGE</Text>
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const [meta, matches, stand] = await Promise.all([
+        MLBBApiService.getHeroRank('mythic', 7),
+        MLBBApiService.getMLBBMatches('not_started', 10),
+        MLBBApiService.getMLBBStandings(selectedRegion.slug)
+      ]);
+
+      if (meta) setMetaData(meta.slice(0, 3));
+      if (matches) setNextMatches(matches);
+      if (stand && stand.length > 0) {
+        const sortedStandings = stand.sort((a, b) => a.rank - b.rank);
+        setStandings(sortedStandings);
+      } else {
+        setStandings([]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch tournament data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatTime = (isoString) => {
+    const date = new Date(isoString);
+    const day = date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+    const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return `${day} ${time}`;
+  };
+
+  const renderTop3 = () => (
+    <View style={styles.top3Container}>
+      {standings.slice(0, 3).map((team, idx) => {
+        const winRate = ((team.wins / (team.wins + team.losses)) * 100).toFixed(0);
+        return (
+          <View key={idx} style={[styles.top3Card, idx === 0 && styles.firstPlace]}>
+            <View style={styles.top3Badge}>
+              <Text style={styles.top3BadgeText}>{winRate}% WR</Text>
+            </View>
+            <Text style={styles.top3Rank}>#{idx + 1}</Text>
+            <View style={styles.top3LogoBg}>
+              <Image 
+                source={{ uri: team.logo || 'https://placehold.co/100/111/white?text=' + team.acronym }} 
+                style={styles.top3Logo} 
+                resizeMode="contain"
+              />
+            </View>
+            <Text style={styles.top3Name} numberOfLines={1}>{team.acronym || team.teamName.split(' ')[0]}</Text>
+            <Text style={styles.top3Points}>{team.wins}W - {team.losses}L</Text>
+            <Text style={styles.top3SubStat}>{team.gameWins} GWINS</Text>
           </View>
+        );
+      })}
+    </View>
+  );
+
+  const renderHeader = () => (
+    <View>
+      <LinearGradient colors={['#1a1a1a', '#000']} style={styles.heroHeader}>
+        <View style={styles.topNav}>
+          <Text style={styles.brandTitle}>MOLECUL</Text>
+          <TouchableOpacity onPress={() => setShowRegionModal(true)} style={styles.globeIcon}>
+            <Ionicons name="globe-outline" size={24} color={PALETTE.redNeon} />
+            <View style={styles.regionBadge}><Text style={styles.regionBadgeText}>{selectedRegion.id}</Text></View>
+          </TouchableOpacity>
         </View>
+        
+        <View style={styles.heroTextContainer}>
+          <Text style={styles.heroSubtitle}>REGULAR SEASON | {selectedRegion.league}</Text>
+          <Text style={styles.heroTitle}>{selectedRegion.name}</Text>
+          <Text style={styles.heroTitle}>POWER RANK</Text>
+        </View>
+
+        {standings.length > 0 ? renderTop3() : (
+          <View style={styles.emptyStandings}><Text style={styles.emptyText}>NO DATA FOR {selectedRegion.name}</Text></View>
+        )}
       </LinearGradient>
 
-      {/* 3. SECTION: STANDINGS */}
       <View style={styles.sectionHeader}>
-        <View style={styles.redBar} />
-        <View>
-          <Text style={styles.sectionTitle}>GROUP STAGE STANDINGS</Text>
-          <Text style={styles.sectionSubTitle}>W-L (MATCHES) / W-L (GAMES) / POINTS</Text>
-        </View>
-      </View>
-      
-      <View style={styles.tableCardContainer}>
-        <View style={styles.tableHeaderRow}>
-          <Text style={[styles.headerLabel, { width: 40, textAlign: 'center' }]}>RANK</Text>
-          <Text style={[styles.headerLabel, { flex: 3, paddingLeft: 10 }]}>TEAM</Text>
-          <Text style={[styles.headerLabel, { flex: 1, textAlign: 'center' }]}>M</Text>
-          <Text style={[styles.headerLabel, { flex: 1, textAlign: 'center' }]}>G</Text>
-          <Text style={[styles.headerLabel, { flex: 1, textAlign: 'center' }]}>P</Text>
-        </View>
+        <Text style={styles.sectionTitleMain}>{selectedRegion.league}</Text>
+        <Text style={styles.sectionTitleSub}>OFFICIAL TOURNAMENT RANKINGS</Text>
       </View>
     </View>
   );
 
-  const renderListFooter = () => (
-    <View style={{ marginTop: 25, paddingBottom: 100 }}>
-      {/* SECTION: NEXT MATCH */}
-      <View style={[styles.sectionHeader, { marginBottom: 15 }]}>
-        <View style={styles.redBar} />
-        <Text style={styles.sectionTitle}>NEXT MATCH</Text>
-      </View>
-      <View style={styles.matchesRow}>
-        <MatchCard time="16:00" teamA="RRQ" teamB="EVOS" isLive={true} />
-        <MatchCard time="19:00" teamA="ONIC" teamB="BTR" isLive={false} />
-      </View>
-
-      {/* SECTION: META ANALYSIS */}
-      <View style={[styles.sectionHeader, { marginTop: 30, marginBottom: 15 }]}>
-        <View style={styles.redBar} />
-        <View style={{ flex: 1, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={styles.sectionTitle}>META ANALYSIS</Text>
-          <TouchableOpacity>
-             <Text style={{ color: PALETTE.redNeon, fontSize: 12, fontWeight: 'bold' }}>VIEW ALL</Text>
-          </TouchableOpacity>
+  const renderStandingItem = ({ item, index }) => (
+    <TouchableOpacity style={styles.standingCard}>
+      <View style={styles.standingLeft}>
+        <Text style={styles.rankNumber}>{(index + 4) < 10 ? `0${index + 4}` : (index + 4)}</Text>
+        <View style={styles.vLine} />
+        <View style={styles.teamBrand}>
+          <View style={styles.miniLogoBox}>
+            <Image 
+              source={{ uri: item.logo || 'https://placehold.co/100/111/white?text=' + item.acronym }} 
+              style={styles.miniLogo} 
+              resizeMode="contain"
+            />
+          </View>
+            <View>
+              <Text style={styles.teamNameMain}>{(item.teamName || 'UNKNOWN').toUpperCase()}</Text>
+              <Text style={styles.teamWLR}>{item.wins}W - {item.losses}L ({((item.wins / (item.wins + item.losses || 1)) * 100).toFixed(0)}% WR)</Text>
+            </View>
         </View>
       </View>
+      <View style={styles.standingRight}>
+        <Text style={styles.statMain}>{item.gameWins}</Text>
+        <Text style={styles.statSub}>G.WINS</Text>
+      </View>
+    </TouchableOpacity>
+  );
 
-      <View style={{ paddingHorizontal: SIZES.padding }}>
-        <MetaCard heroName="LING" winRate="65.2" pickRate="12.4" banRate="88.1" imageUrl="https://placehold.co/100/black/white?text=LING" />
-        <MetaCard heroName="VALENTINA" winRate="58.9" pickRate="24.1" banRate="45.3" imageUrl="https://placehold.co/100/black/white?text=VAL" />
+  const renderFooter = () => (
+    <View style={styles.footer}>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitleMain}>UPCOMING</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('SCHEDULE')}>
+          <Text style={styles.viewMoreText}>FULL SCHEDULE</Text>
+        </TouchableOpacity>
       </View>
 
-      {/* MVP TRACKER SECTION */}
-      <View style={[styles.sectionHeader, { marginTop: 30, marginBottom: 15 }]}>
-        <View style={styles.redBar} />
-        <Text style={styles.sectionTitle}>MVP TRACKER</Text>
+      <View style={styles.matchesRow}>
+        {nextMatches.slice(0, 2).map((match, idx) => (
+          <TouchableOpacity key={idx} style={styles.smallMatchCard}>
+            <Text style={styles.matchTime}>{formatTime(match.beginAt)}</Text>
+            <Text style={styles.matchTeams}>{match.opponents?.[0]?.acronym || 'TBD'} VS {match.opponents?.[1]?.acronym || 'TBD'}</Text>
+            <Text style={styles.matchLeague}>{(match.league || 'PRO').substring(0, 10).toUpperCase()}</Text>
+          </TouchableOpacity>
+        ))}
       </View>
-      
-      <View style={styles.mvpContainer}>
-         <LinearGradient colors={['#FF3B3B', '#800000']} style={styles.mvpCard}>
-            <Text style={styles.mvpTitle}>PLAYER OF THE WEEK</Text>
-            <Text style={styles.playerName}>RRQ ALBERTTT</Text>
-            <View style={styles.mvpStatsRow}>
-               <Text style={styles.mvpStatText}>KDA: 12.5</Text>
-               <Text style={styles.mvpStatText}>KP: 85%</Text>
-            </View>
-         </LinearGradient>
+
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitleMain}>META SHIFT</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('HEROES')}>
+          <Text style={styles.viewMoreText}>ANALYSIS</Text>
+        </TouchableOpacity>
       </View>
+
+      {metaData.map((hero, idx) => (
+        <TouchableOpacity key={idx} style={styles.metaRow} onPress={() => navigation.navigate('HEROES', { screen: 'HeroDetail', params: { heroId: hero.id, heroName: hero.heroName } })}>
+          <Image source={{ uri: hero.imageUrl }} style={styles.heroMetaImg} />
+          <View style={{ flex: 1, marginLeft: 15 }}>
+            <Text style={styles.heroMetaName}>{hero.heroName}</Text>
+            <Text style={styles.heroMetaStats}>WIN RATE: {hero.winRate}% | PICK: {hero.pickRate}%</Text>
+          </View>
+          <Ionicons name="trending-up" size={16} color={PALETTE.redNeon} />
+        </TouchableOpacity>
+      ))}
+
+      <View style={{ height: 100 }} />
     </View>
   );
 
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
-        data={DUMMY_TEAMS}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.tableRowWrapper}>
-            <StandingRow 
-              rank={item.rank}
-              teamName={item.name}
-              logoUrl={item.logo}
-              matches={item.m}
-              games={item.g}
-              points={item.p}
-            />
-          </View>
-        )}
-        ListHeaderComponent={renderListHeader}
-        ListFooterComponent={renderListFooter}
-        contentContainerStyle={styles.listContent}
+        data={standings.slice(3)}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item, index }) => renderStandingItem({ item, index })}
+        ListHeaderComponent={renderHeader}
+        ListFooterComponent={renderFooter}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: 50 }}
+        refreshing={loading}
+        onRefresh={fetchData}
       />
+
+      <Modal visible={showRegionModal} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>SWITCH REGION</Text>
+            {REGIONS.map((region) => (
+              <TouchableOpacity 
+                key={region.id} 
+                style={[styles.regionItem, selectedRegion.id === region.id && styles.selectedRegionItem]}
+                onPress={() => {
+                  setSelectedRegion(region);
+                  setShowRegionModal(false);
+                }}
+              >
+                <Text style={[styles.regionItemText, selectedRegion.id === region.id && styles.selectedRegionItemText]}>
+                  {region.name}
+                </Text>
+                {selectedRegion.id === region.id && <Ionicons name="checkmark-circle" size={20} color={PALETTE.redNeon} />}
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity onPress={() => setShowRegionModal(false)} style={styles.closeBtn}>
+              <Text style={styles.closeBtnText}>CLOSE</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: PALETTE.black },
-  listContent: { paddingTop: 10 },
-  
-  mainHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: SIZES.padding, marginBottom: 25 },
-  moleculLogo: { color: PALETTE.redNeon, fontSize: 22, fontWeight: 'bold', letterSpacing: 4 },
-  profileBox: { width: 35, height: 35, backgroundColor: '#333', borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
-  
-  bannerCard: { padding: 20, borderRadius: SIZES.radiusL, borderWidth: 1, borderColor: '#333', marginHorizontal: SIZES.padding, marginBottom: 30 },
-  liveBadge: { backgroundColor: PALETTE.redNeon, alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 4, marginBottom: 10 },
-  liveText: { color: 'white', fontSize: 9, fontWeight: 'bold' },
-  bannerTitle: { color: 'white', fontSize: 28, fontWeight: 'bold', marginBottom: 8 },
-  bannerDesc: { color: PALETTE.textMuted, fontSize: 12, lineHeight: 18, marginBottom: 20 },
-  bannerInfoRow: { flexDirection: 'row', justifyContent: 'space-between' },
-  infoLabel: { color: '#666', fontSize: 10, fontWeight: 'bold' },
-  infoValue: { color: 'white', fontSize: 18, fontWeight: 'bold' },
-  
-  sectionHeader: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: SIZES.padding, marginBottom: 10 },
-  redBar: { width: 3, height: 25, backgroundColor: PALETTE.redNeon, marginRight: 10, borderRadius: 2 },
-  sectionTitle: { color: PALETTE.textMain, fontSize: 18, fontWeight: 'bold' },
-  sectionSubTitle: { color: PALETTE.textMuted, fontSize: 11, marginTop: 2 },
-  
-  tableCardContainer: { 
-    backgroundColor: PALETTE.darkGray, 
-    marginHorizontal: SIZES.padding, 
-    borderTopLeftRadius: SIZES.radiusM, 
-    borderTopRightRadius: SIZES.radiusM, 
-    padding: 10, 
-    paddingBottom: 0 
-  },
-  tableRowWrapper: { 
-    backgroundColor: PALETTE.darkGray, 
-    marginHorizontal: SIZES.padding,
-    paddingHorizontal: 10 
-  }, 
-  tableHeaderRow: { flexDirection: 'row', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#333' },
-  headerLabel: { color: '#666', fontSize: 11, fontWeight: '500' },
-  
-  matchesRow: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: SIZES.padding },
+  container: { flex: 1, backgroundColor: '#000' },
+  heroHeader: { paddingBottom: 40, borderBottomLeftRadius: 30, borderBottomRightRadius: 30 },
+  topNav: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 25 },
+  brandTitle: { color: 'white', fontSize: 24, fontWeight: '900', letterSpacing: 5 },
+  globeIcon: { width: 50, height: 50, borderRadius: 25, backgroundColor: '#111', justifyContent: 'center', alignItems: 'center', borderWidth: 1, borderColor: '#222', position: 'relative' },
+  regionBadge: { position: 'absolute', top: -5, right: -5, backgroundColor: PALETTE.redNeon, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 10 },
+  regionBadgeText: { color: 'white', fontSize: 8, fontWeight: 'bold' },
 
-  mvpContainer: { paddingHorizontal: SIZES.padding },
-  mvpCard: { padding: 20, borderRadius: SIZES.radiusM, height: 120, justifyContent: 'center' },
-  mvpTitle: { color: 'rgba(255,255,255,0.6)', fontSize: 10, fontWeight: 'bold', letterSpacing: 2 },
-  playerName: { color: 'white', fontSize: 24, fontWeight: '900', marginVertical: 5 },
-  mvpStatsRow: { flexDirection: 'row', gap: 15 },
-  mvpStatText: { color: 'white', fontSize: 12, fontWeight: 'bold' },
+  heroTextContainer: { paddingHorizontal: 30, marginTop: 10 },
+  heroSubtitle: { color: PALETTE.redNeon, fontSize: 10, fontWeight: '900', letterSpacing: 2, marginBottom: 5 },
+  heroTitle: { color: 'white', fontSize: 38, fontWeight: '900', lineHeight: 40 },
+
+  top3Container: { flexDirection: 'row', justifyContent: 'center', marginTop: 30, gap: 10 },
+  top3Card: { width: width / 3.6, backgroundColor: '#111', padding: 15, borderRadius: 15, alignItems: 'center', borderWidth: 1, borderColor: '#222', position: 'relative' },
+  firstPlace: { borderColor: PALETTE.redNeon, backgroundColor: '#1a1010' },
+  top3Badge: { position: 'absolute', top: 5, right: 5, backgroundColor: '#222', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4 },
+  top3BadgeText: { color: PALETTE.redNeon, fontSize: 7, fontWeight: 'bold' },
+  top3Rank: { color: PALETTE.redNeon, fontSize: 10, fontWeight: 'bold', marginBottom: 10 },
+  top3LogoBg: { width: 55, height: 55, borderRadius: 27.5, backgroundColor: '#000', marginBottom: 10, padding: 5 },
+  top3Logo: { width: '100%', height: '100%' },
+  top3Name: { color: 'white', fontSize: 10, fontWeight: 'bold' },
+  top3Points: { color: '#eee', fontSize: 11, fontWeight: 'bold', marginTop: 5 },
+  top3SubStat: { color: '#444', fontSize: 8, marginTop: 2, fontWeight: 'bold' },
+
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', paddingHorizontal: 25, marginTop: 40, marginBottom: 20 },
+  sectionTitleMain: { color: 'white', fontSize: 28, fontWeight: '900', letterSpacing: 1 },
+  sectionTitleSub: { color: '#444', fontSize: 9, fontWeight: 'bold' },
+  viewMoreText: { color: PALETTE.redNeon, fontSize: 10, fontWeight: 'bold' },
+
+  standingCard: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#0a0a0a', marginHorizontal: 20, padding: 20, borderRadius: 12, marginBottom: 10, borderWidth: 1, borderColor: '#111' },
+  standingLeft: { flexDirection: 'row', alignItems: 'center' },
+  rankNumber: { color: '#333', fontSize: 18, fontWeight: '900', width: 30 },
+  vLine: { width: 1, height: 20, backgroundColor: '#222', marginHorizontal: 15 },
+  teamBrand: { flexDirection: 'row', alignItems: 'center' },
+  miniLogoBox: { width: 35, height: 35, borderRadius: 17.5, backgroundColor: '#000', padding: 5, marginRight: 12 },
+  miniLogo: { width: '100%', height: '100%' },
+  teamNameMain: { color: 'white', fontSize: 12, fontWeight: '700' },
+  teamWLR: { color: '#555', fontSize: 9, fontWeight: 'bold', marginTop: 2 },
+  standingRight: { alignItems: 'flex-end' },
+  statMain: { color: 'white', fontSize: 18, fontWeight: '900' },
+  statSub: { color: '#444', fontSize: 8, fontWeight: 'bold' },
+
+  matchesRow: { flexDirection: 'row', gap: 15, paddingHorizontal: 25 },
+  smallMatchCard: { flex: 1, backgroundColor: '#0a0a0a', padding: 15, borderRadius: 12, borderWidth: 1, borderColor: '#111' },
+  matchTime: { color: PALETTE.redNeon, fontSize: 10, fontWeight: 'bold' },
+  matchTeams: { color: 'white', fontSize: 12, fontWeight: 'bold', marginVertical: 8 },
+  matchLeague: { color: '#444', fontSize: 8, fontWeight: 'bold' },
+
+  metaRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0a0a0a', marginHorizontal: 25, padding: 15, borderRadius: 12, marginBottom: 10, borderWidth: 1, borderColor: '#111' },
+  heroMetaImg: { width: 40, height: 40, borderRadius: 6 },
+  heroMetaName: { color: 'white', fontSize: 14, fontWeight: 'bold' },
+  heroMetaStats: { color: '#555', fontSize: 10, marginTop: 4 },
+
+  emptyStandings: { padding: 40, alignItems: 'center' },
+  emptyText: { color: '#444', fontSize: 12, fontWeight: 'bold' },
+
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', alignItems: 'center' },
+  modalContent: { width: '80%', backgroundColor: '#111', borderRadius: 20, padding: 25, borderWidth: 1, borderColor: '#222' },
+  modalTitle: { color: 'white', fontSize: 18, fontWeight: 'bold', marginBottom: 20, textAlign: 'center', letterSpacing: 2 },
+  regionItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: '#222' },
+  selectedRegionItem: { backgroundColor: '#1a1010', paddingHorizontal: 10, borderRadius: 8 },
+  regionItemText: { color: '#888', fontSize: 14, fontWeight: 'bold' },
+  selectedRegionItemText: { color: 'white' },
+  closeBtn: { marginTop: 25, alignItems: 'center', paddingVertical: 10 },
+  closeBtnText: { color: '#444', fontSize: 12, fontWeight: 'bold' },
 });
 
 export default TournamentHubScreen;

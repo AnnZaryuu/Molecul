@@ -3,7 +3,7 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { PALETTE, SIZES } from '../theme/theme';
 
-const MatchCard = ({ time, teamA, teamB, isLive }) => {
+const MatchCard = ({ time, teamA, teamB, isLive, league = "PRO LEAGUE" }) => {
   // Border merah menyala jika sedang live
   const cardBorderStyle = isLive ? { borderColor: PALETTE.redNeon, borderWidth: 1.5 } : {};
 
@@ -19,6 +19,8 @@ const MatchCard = ({ time, teamA, teamB, isLive }) => {
         <Text style={styles.vsText}>VS</Text>
         <View style={styles.teamBox}><Text style={styles.teamText}>{teamB}</Text></View>
       </View>
+
+      <Text style={styles.leagueText}>{league}</Text>
     </View>
   );
 };
@@ -26,7 +28,7 @@ const MatchCard = ({ time, teamA, teamB, isLive }) => {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: PALETTE.darkGray,
-    width: '48%', // Agar muat 2 kartu berjajar
+    width: '48%', 
     padding: 15,
     borderRadius: SIZES.radiusM,
     borderColor: PALETTE.lightGray,
@@ -38,14 +40,15 @@ const styles = StyleSheet.create({
   teamsRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   teamBox: { 
     backgroundColor: '#000', 
-    paddingHorizontal: 10, 
+    paddingHorizontal: 8, 
     paddingVertical: 5, 
     borderRadius: 4, 
     width: '40%', 
     alignItems: 'center' 
   },
-  teamText: { color: PALETTE.textMain, fontSize: 11, fontWeight: 'bold' },
-  vsText: { color: PALETTE.textDark, fontSize: 10, fontWeight: 'bold' },
+  teamText: { color: PALETTE.textMain, fontSize: 10, fontWeight: 'bold' },
+  vsText: { color: PALETTE.textDark, fontSize: 9, fontWeight: 'bold' },
+  leagueText: { color: PALETTE.redNeon, fontSize: 8, fontWeight: 'bold', textAlign: 'center', marginTop: 10, letterSpacing: 0.5 }
 });
 
 export default MatchCard;

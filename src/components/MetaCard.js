@@ -1,10 +1,10 @@
 import React from 'react';
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import { PALETTE, SIZES } from '../theme/theme';
 
-const MetaCard = ({ heroName, winRate, pickRate, banRate, imageUrl }) => {
+const MetaCard = ({ heroName, winRate, pickRate, banRate, imageUrl, onPress }) => {
   return (
-    <View style={styles.container}>
+    <TouchableOpacity style={styles.container} onPress={onPress} disabled={!onPress}>
       <Image source={{ uri: imageUrl }} style={styles.heroImage} />
       <View style={styles.infoContainer}>
         <Text style={styles.heroName}>{heroName}</Text>
@@ -23,7 +23,7 @@ const MetaCard = ({ heroName, winRate, pickRate, banRate, imageUrl }) => {
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
