@@ -1,17 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   StyleSheet, Text, View, FlatList, Image, 
-  TouchableOpacity, SafeAreaView, TextInput, ActivityIndicator, Dimensions 
+  TouchableOpacity, TextInput, ActivityIndicator, Platform,
+  useWindowDimensions
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { PALETTE, SIZES } from '../theme/theme';
+import { useFocusEffect } from '@react-navigation/native';
+import { PALETTE } from '../theme/theme';
 import { MLBBApiService } from '../services/mlbbApiService';
 
-const { width } = Dimensions.get('window');
-
 const ROLES = ['ALL', 'Tank', 'Fighter', 'Assassin', 'Mage', 'Marksman', 'Support'];
+const isWeb = Platform.OS === 'web';
 
 const HeroDatabaseScreen = ({ navigation }) => {
+  const { width } = useWindowDimensions();
+  const numColumns = isWeb ? 6 : 3;
+  const cardWidth = isWeb
+    ? (width - 220 - 40 - (numColumns * 10)) / numColumns  // 220=sidebar, 40=padding
+    : (width - 20 - (numColumns * 10)) / numColumns;
+    
   const [heroes, setHeroes] = useState([]);
   const [filteredHeroes, setFilteredHeroes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,6 +29,15 @@ const HeroDatabaseScreen = ({ navigation }) => {
   useEffect(() => {
     fetchHeroes();
   }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      setFilteredHeroes(prev => {
+        if (prev.length === 0) return prev;
+        return applyFiltersImmediate(heroes, search, selectedRole);
+      });
+    }, [heroes, search, selectedRole])
+  );
 
   const fetchHeroes = async () => {
     setLoading(true);
@@ -37,22 +54,23 @@ const HeroDatabaseScreen = ({ navigation }) => {
     }
   };
 
-  const applyFilters = (searchText, role) => {
-    let filtered = [...heroes];
-    
+  const applyFiltersImmediate = (heroList, searchText, role) => {
+    let filtered = [...heroList];
     if (searchText) {
-      filtered = filtered.filter(h => 
+      filtered = filtered.filter(h =>
         h.name?.toLowerCase().includes(searchText.toLowerCase())
       );
     }
-    
     if (role !== 'ALL') {
-      filtered = filtered.filter(h => 
-        h.type?.toLowerCase().includes(role.toLowerCase())
+      filtered = filtered.filter(h =>
+        h.type?.toLowerCase() === role.toLowerCase()
       );
     }
-    
-    setFilteredHeroes(filtered);
+    return filtered;
+  };
+
+  const applyFilters = (searchText, role) => {
+    setFilteredHeroes(applyFiltersImmediate(heroes, searchText, role));
   };
 
   const handleSearch = (text) => {
@@ -64,26 +82,6 @@ const HeroDatabaseScreen = ({ navigation }) => {
     setSelectedRole(role);
     applyFilters(search, role);
   };
-
-  const renderHeroItem = ({ item }) => (
-    <TouchableOpacity 
-      style={styles.heroCard}
-      onPress={() => navigation.navigate('HeroDetail', { 
-        heroId: item.id, 
-        heroName: item.name,
-        heroHead: item.head
-      })}
-    >
-      <View style={styles.imageContainer}>
-        <Image 
-          source={{ uri: item.head || 'https://placehold.co/150/111/white?text=' + (item.name?.[0] || 'H') }} 
-          style={styles.heroImage} 
-          resizeMode="cover"
-        />
-      </View>
-      <Text style={styles.heroName} numberOfLines={1}>{item.name.toUpperCase()}</Text>
-    </TouchableOpacity>
-  );
 
   const renderRoleItem = ({ item }) => (
     <TouchableOpacity 
@@ -138,9 +136,27 @@ const HeroDatabaseScreen = ({ navigation }) => {
       ) : (
         <FlatList
           data={filteredHeroes}
-          renderItem={renderHeroItem}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={[styles.heroCard, { width: cardWidth }]}
+              onPress={() => navigation.navigate('HeroDetail', { heroId: item.id, heroName: item.name, heroHead: item.head })}
+            >
+              <View style={styles.imageContainer}>
+                <Image
+                  source={{ uri: item.head || `https://placehold.co/150/111/white?text=${encodeURIComponent(item.name?.[0] || 'H')}` }}
+                  style={styles.heroImage}
+                  resizeMode="cover"
+                />
+                <View style={styles.roleTag}>
+                  <Text style={styles.roleTagText}>{(item.type || 'FIGHTER').toUpperCase()}</Text>
+                </View>
+              </View>
+              <Text style={styles.heroName} numberOfLines={1}>{(item.name || '').toUpperCase()}</Text>
+            </TouchableOpacity>
+          )}
           keyExtractor={(item, index) => item.id?.toString() || index.toString()}
-          numColumns={3}
+          key={numColumns}
+          numColumns={numColumns}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={() => (
@@ -158,67 +174,43 @@ const HeroDatabaseScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#000' },
   header: { 
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    alignItems: 'center', 
-    paddingHorizontal: 25, 
-    paddingVertical: 20,
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', 
+    paddingHorizontal: 25, paddingVertical: 20,
   },
   headerSubtitle: { color: PALETTE.redNeon, fontSize: 10, fontWeight: '900', letterSpacing: 2 },
-  headerTitle: { color: 'white', fontSize: 24, fontWeight: '900', letterSpacing: 1 },
+  headerTitle: { color: 'white', fontSize: isWeb ? 32 : 24, fontWeight: '900', letterSpacing: 1 },
   refreshBtn: { width: 40, height: 40, borderRadius: 20, backgroundColor: '#111', justifyContent: 'center', alignItems: 'center' },
   
   searchBar: { 
-    flexDirection: 'row', 
-    alignItems: 'center', 
-    backgroundColor: '#0a0a0a', 
-    marginHorizontal: 20, 
-    paddingHorizontal: 15, 
-    paddingVertical: 12,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#111',
-    marginBottom: 15
+    flexDirection: 'row', alignItems: 'center', 
+    backgroundColor: '#0a0a0a', marginHorizontal: 20, 
+    paddingHorizontal: 15, paddingVertical: 12,
+    borderRadius: 8, borderWidth: 1, borderColor: '#111', marginBottom: 15
   },
-  searchInput: { flex: 1, color: 'white', fontSize: 11, fontWeight: 'bold' },
+  searchInput: { flex: 1, color: 'white', fontSize: 11, fontWeight: 'bold', outlineStyle: 'none' },
 
   roleFilterContainer: { marginBottom: 20, height: 35 },
-  roleBtn: { 
-    paddingHorizontal: 15, 
-    height: 30, 
-    justifyContent: 'center', 
-    borderRadius: 15, 
-    backgroundColor: '#0a0a0a', 
-    marginRight: 10,
-    borderWidth: 1,
-    borderColor: '#111'
-  },
+  roleBtn: { paddingHorizontal: 15, height: 30, justifyContent: 'center', borderRadius: 15, backgroundColor: '#0a0a0a', marginRight: 10, borderWidth: 1, borderColor: '#111' },
   roleBtnActive: { backgroundColor: PALETTE.redNeon, borderColor: PALETTE.redNeon },
   roleBtnText: { color: '#555', fontSize: 9, fontWeight: '900' },
   roleBtnTextActive: { color: 'white' },
 
   listContent: { paddingHorizontal: 10, paddingBottom: 100 },
-  heroCard: { 
-    width: (width - 40) / 3, 
-    margin: 5, 
-    backgroundColor: '#0a0a0a', 
-    borderRadius: 12, 
+  heroCard: {
+    margin: 5,
+    backgroundColor: '#0a0a0a',
+    borderRadius: 12,
     padding: 8,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#111'
   },
-  imageContainer: { width: '100%', aspectRatio: 1, position: 'relative', marginBottom: 10 },
-  heroImage: { width: '100%', height: '100%', borderRadius: 8, backgroundColor: '#000' },
+  imageContainer: { width: '100%', aspectRatio: 1, position: 'relative', marginBottom: 8 },
+  heroImage: { width: '100%', height: '100%', borderRadius: 8, backgroundColor: '#111' },
   roleTag: { 
-    position: 'absolute', 
-    bottom: 0, 
-    left: 0, 
-    right: 0, 
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    paddingVertical: 3,
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8
+    position: 'absolute', bottom: 0, left: 0, right: 0, 
+    backgroundColor: 'rgba(0,0,0,0.7)', paddingVertical: 3,
+    borderBottomLeftRadius: 8, borderBottomRightRadius: 8
   },
   roleTagText: { color: PALETTE.redNeon, fontSize: 7, fontWeight: '900', textAlign: 'center' },
   heroName: { color: 'white', fontSize: 10, fontWeight: 'bold' },

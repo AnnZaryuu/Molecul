@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, FlatList, SafeAreaView, TouchableOpacity, ActivityIndicator, Dimensions, Image, Modal } from 'react-native';
+import { StyleSheet, Text, View, FlatList, ScrollView, TouchableOpacity, ActivityIndicator, Dimensions, Image, Modal, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { PALETTE, SIZES } from '../theme/theme';
+import { PALETTE } from '../theme/theme';
+import { TEAM_LOGOS } from '../theme/teamLogos';
 import { MLBBApiService } from '../services/mlbbApiService';
 import { useNavigation } from '@react-navigation/native';
-
-const { width } = Dimensions.get('window');
 
 const REGIONS = [
   { id: 'ID', name: 'INDONESIA', slug: 'mlbb-mpl-indonesia-17-2026-regular-season', league: 'MPL ID S17' },
@@ -14,10 +14,11 @@ const REGIONS = [
   { id: 'MY', name: 'MALAYSIA', slug: 'mlbb-mpl-malaysia-17-2026-regular-season', league: 'MPL MY S17' },
 ];
 
+const isWeb = Platform.OS === 'web';
+
 const TournamentHubScreen = () => {
   const navigation = useNavigation();
   const [selectedRegion, setSelectedRegion] = useState(REGIONS[0]);
-  const [metaData, setMetaData] = useState([]);
   const [nextMatches, setNextMatches] = useState([]);
   const [standings, setStandings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,13 +31,11 @@ const TournamentHubScreen = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [meta, matches, stand] = await Promise.all([
-        MLBBApiService.getHeroRank('mythic', 7),
+      const [matches, stand] = await Promise.all([
         MLBBApiService.getMLBBMatches('not_started', 10),
         MLBBApiService.getMLBBStandings(selectedRegion.slug)
       ]);
 
-      if (meta) setMetaData(meta.slice(0, 3));
       if (matches) setNextMatches(matches);
       if (stand && stand.length > 0) {
         const sortedStandings = stand.sort((a, b) => a.rank - b.rank);
@@ -61,7 +60,8 @@ const TournamentHubScreen = () => {
   const renderTop3 = () => (
     <View style={styles.top3Container}>
       {standings.slice(0, 3).map((team, idx) => {
-        const winRate = ((team.wins / (team.wins + team.losses)) * 100).toFixed(0);
+        const totalGames = team.wins + team.losses;
+        const winRate = totalGames > 0 ? ((team.wins / totalGames) * 100).toFixed(0) : '0';
         return (
           <View key={idx} style={[styles.top3Card, idx === 0 && styles.firstPlace]}>
             <View style={styles.top3Badge}>
@@ -69,9 +69,9 @@ const TournamentHubScreen = () => {
             </View>
             <Text style={styles.top3Rank}>#{idx + 1}</Text>
             <View style={styles.top3LogoBg}>
-              <Image 
-                source={{ uri: team.logo || 'https://placehold.co/100/111/white?text=' + team.acronym }} 
-                style={styles.top3Logo} 
+              <Image
+                source={TEAM_LOGOS[team.acronym] ? TEAM_LOGOS[team.acronym] : (team.logo ? { uri: team.logo } : { uri: `https://placehold.co/100/111/white?text=${team.acronym || '?'}` })}
+                style={styles.top3Logo}
                 resizeMode="contain"
               />
             </View>
@@ -105,23 +105,18 @@ const TournamentHubScreen = () => {
           <View style={styles.emptyStandings}><Text style={styles.emptyText}>NO DATA FOR {selectedRegion.name}</Text></View>
         )}
       </LinearGradient>
-
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitleMain}>{selectedRegion.league}</Text>
-        <Text style={styles.sectionTitleSub}>OFFICIAL TOURNAMENT RANKINGS</Text>
-      </View>
     </View>
   );
 
-  const renderStandingItem = ({ item, index }) => (
-    <TouchableOpacity style={styles.standingCard}>
+  const renderStandingItem = (item, index) => (
+    <View key={index} style={styles.standingCard}>
       <View style={styles.standingLeft}>
         <Text style={styles.rankNumber}>{(index + 4) < 10 ? `0${index + 4}` : (index + 4)}</Text>
         <View style={styles.vLine} />
         <View style={styles.teamBrand}>
           <View style={styles.miniLogoBox}>
             <Image 
-              source={{ uri: item.logo || 'https://placehold.co/100/111/white?text=' + item.acronym }} 
+              source={TEAM_LOGOS[item.acronym] ? TEAM_LOGOS[item.acronym] : (item.logo ? { uri: item.logo } : { uri: `https://placehold.co/100/111/white?text=${item.acronym || '?'}` })} 
               style={styles.miniLogo} 
               resizeMode="contain"
             />
@@ -136,20 +131,20 @@ const TournamentHubScreen = () => {
         <Text style={styles.statMain}>{item.gameWins}</Text>
         <Text style={styles.statSub}>G.WINS</Text>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 
-  const renderFooter = () => (
-    <View style={styles.footer}>
-      <View style={styles.sectionHeader}>
+  const renderUpcoming = () => (
+    <View style={styles.upcomingContainer}>
+      <View style={[styles.sectionHeader, { marginTop: isWeb ? 0 : 40 }]}>
         <Text style={styles.sectionTitleMain}>UPCOMING</Text>
         <TouchableOpacity onPress={() => navigation.navigate('SCHEDULE')}>
           <Text style={styles.viewMoreText}>FULL SCHEDULE</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.matchesRow}>
-        {nextMatches.slice(0, 2).map((match, idx) => (
+      <View style={isWeb ? styles.matchesColWeb : styles.matchesRow}>
+        {nextMatches.slice(0, isWeb ? 4 : 2).map((match, idx) => (
           <TouchableOpacity key={idx} style={styles.smallMatchCard}>
             <Text style={styles.matchTime}>{formatTime(match.beginAt)}</Text>
             <Text style={styles.matchTeams}>{match.opponents?.[0]?.acronym || 'TBD'} VS {match.opponents?.[1]?.acronym || 'TBD'}</Text>
@@ -157,42 +152,40 @@ const TournamentHubScreen = () => {
           </TouchableOpacity>
         ))}
       </View>
-
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitleMain}>META SHIFT</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('HEROES')}>
-          <Text style={styles.viewMoreText}>ANALYSIS</Text>
-        </TouchableOpacity>
-      </View>
-
-      {metaData.map((hero, idx) => (
-        <TouchableOpacity key={idx} style={styles.metaRow} onPress={() => navigation.navigate('HEROES', { screen: 'HeroDetail', params: { heroId: hero.id, heroName: hero.heroName } })}>
-          <Image source={{ uri: hero.imageUrl }} style={styles.heroMetaImg} />
-          <View style={{ flex: 1, marginLeft: 15 }}>
-            <Text style={styles.heroMetaName}>{hero.heroName}</Text>
-            <Text style={styles.heroMetaStats}>WIN RATE: {hero.winRate}% | PICK: {hero.pickRate}%</Text>
-          </View>
-          <Ionicons name="trending-up" size={16} color={PALETTE.redNeon} />
-        </TouchableOpacity>
-      ))}
-
-      <View style={{ height: 100 }} />
     </View>
   );
 
   return (
     <SafeAreaView style={styles.container}>
-      <FlatList
-        data={standings.slice(3)}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item, index }) => renderStandingItem({ item, index })}
-        ListHeaderComponent={renderHeader}
-        ListFooterComponent={renderFooter}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 50 }}
-        refreshing={loading}
-        onRefresh={fetchData}
-      />
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 50 }}>
+        {renderHeader()}
+        
+        {isWeb ? (
+          /* WEB TWO-PANE LAYOUT */
+          <View style={styles.webTwoPane}>
+            <View style={styles.webLeftPane}>
+              <View style={[styles.sectionHeader, { marginTop: 0 }]}>
+                <Text style={styles.sectionTitleMain}>{selectedRegion.league}</Text>
+                <Text style={styles.sectionTitleSub}>OFFICIAL TOURNAMENT RANKINGS</Text>
+              </View>
+              {standings.slice(3).map((item, index) => renderStandingItem(item, index))}
+            </View>
+            <View style={styles.webRightPane}>
+              {renderUpcoming()}
+            </View>
+          </View>
+        ) : (
+          /* MOBILE SINGLE COLUMN LAYOUT */
+          <View>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitleMain}>{selectedRegion.league}</Text>
+              <Text style={styles.sectionTitleSub}>OFFICIAL TOURNAMENT RANKINGS</Text>
+            </View>
+            {standings.slice(3).map((item, index) => renderStandingItem(item, index))}
+            {renderUpcoming()}
+          </View>
+        )}
+      </ScrollView>
 
       <Modal visible={showRegionModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
@@ -234,10 +227,10 @@ const styles = StyleSheet.create({
 
   heroTextContainer: { paddingHorizontal: 30, marginTop: 10 },
   heroSubtitle: { color: PALETTE.redNeon, fontSize: 10, fontWeight: '900', letterSpacing: 2, marginBottom: 5 },
-  heroTitle: { color: 'white', fontSize: 38, fontWeight: '900', lineHeight: 40 },
+  heroTitle: { color: 'white', fontSize: isWeb ? 48 : 38, fontWeight: '900', lineHeight: isWeb ? 52 : 40 },
 
-  top3Container: { flexDirection: 'row', justifyContent: 'center', marginTop: 30, gap: 10 },
-  top3Card: { width: width / 3.6, backgroundColor: '#111', padding: 15, borderRadius: 15, alignItems: 'center', borderWidth: 1, borderColor: '#222', position: 'relative' },
+  top3Container: { flexDirection: 'row', justifyContent: 'center', marginTop: 30, gap: isWeb ? 20 : 10 },
+  top3Card: { flex: 1, maxWidth: isWeb ? 200 : undefined, backgroundColor: '#111', padding: 15, borderRadius: 15, alignItems: 'center', borderWidth: 1, borderColor: '#222', position: 'relative', marginHorizontal: isWeb ? 10 : 0 },
   firstPlace: { borderColor: PALETTE.redNeon, backgroundColor: '#1a1010' },
   top3Badge: { position: 'absolute', top: 5, right: 5, backgroundColor: '#222', paddingHorizontal: 5, paddingVertical: 2, borderRadius: 4 },
   top3BadgeText: { color: PALETTE.redNeon, fontSize: 7, fontWeight: 'bold' },
@@ -266,22 +259,24 @@ const styles = StyleSheet.create({
   statMain: { color: 'white', fontSize: 18, fontWeight: '900' },
   statSub: { color: '#444', fontSize: 8, fontWeight: 'bold' },
 
+  upcomingContainer: { flex: 1 },
   matchesRow: { flexDirection: 'row', gap: 15, paddingHorizontal: 25 },
+  matchesColWeb: { flexDirection: 'column', gap: 15, paddingHorizontal: 25 },
   smallMatchCard: { flex: 1, backgroundColor: '#0a0a0a', padding: 15, borderRadius: 12, borderWidth: 1, borderColor: '#111' },
   matchTime: { color: PALETTE.redNeon, fontSize: 10, fontWeight: 'bold' },
   matchTeams: { color: 'white', fontSize: 12, fontWeight: 'bold', marginVertical: 8 },
   matchLeague: { color: '#444', fontSize: 8, fontWeight: 'bold' },
 
-  metaRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#0a0a0a', marginHorizontal: 25, padding: 15, borderRadius: 12, marginBottom: 10, borderWidth: 1, borderColor: '#111' },
-  heroMetaImg: { width: 40, height: 40, borderRadius: 6 },
-  heroMetaName: { color: 'white', fontSize: 14, fontWeight: 'bold' },
-  heroMetaStats: { color: '#555', fontSize: 10, marginTop: 4 },
-
   emptyStandings: { padding: 40, alignItems: 'center' },
   emptyText: { color: '#444', fontSize: 12, fontWeight: 'bold' },
 
+  // Web Specific
+  webTwoPane: { flexDirection: 'row', marginTop: 40, paddingHorizontal: 20 },
+  webLeftPane: { flex: 2, paddingRight: 20 },
+  webRightPane: { flex: 1 },
+
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', alignItems: 'center' },
-  modalContent: { width: '80%', backgroundColor: '#111', borderRadius: 20, padding: 25, borderWidth: 1, borderColor: '#222' },
+  modalContent: { width: 300, backgroundColor: '#111', borderRadius: 20, padding: 25, borderWidth: 1, borderColor: '#222' },
   modalTitle: { color: 'white', fontSize: 18, fontWeight: 'bold', marginBottom: 20, textAlign: 'center', letterSpacing: 2 },
   regionItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: '#222' },
   selectedRegionItem: { backgroundColor: '#1a1010', paddingHorizontal: 10, borderRadius: 8 },

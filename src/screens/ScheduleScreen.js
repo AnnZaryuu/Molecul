@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import {
-  StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, ActivityIndicator, Image, Modal
+  StyleSheet, Text, View, ScrollView, TouchableOpacity, ActivityIndicator, Image, Modal, Linking, Platform, useWindowDimensions
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { PALETTE, SIZES } from '../theme/theme';
+import { PALETTE } from '../theme/theme';
+import { TEAM_LOGOS } from '../theme/teamLogos';
 import { MLBBApiService } from '../services/mlbbApiService';
 
 const REGIONS = [
@@ -13,7 +15,10 @@ const REGIONS = [
   { id: 'MY', name: 'MALAYSIA', slug: 'mlbb-mpl-malaysia-17-2026-regular-season', league: 'MPL MY S17' },
 ];
 
+const isWeb = Platform.OS === 'web';
+
 const ScheduleScreen = () => {
+  const { width } = useWindowDimensions();
   const [selectedRegion, setSelectedRegion] = useState(REGIONS[0]);
   const [liveMatches, setLiveMatches] = useState([]);
   const [upcomingMatches, setUpcomingMatches] = useState([]);
@@ -32,7 +37,6 @@ const ScheduleScreen = () => {
         MLBBApiService.getMLBBMatches('upcoming', 50)
       ]);
 
-      // Filter logic
       let filteredLive = live || [];
       let filteredUpcoming = upcoming || [];
 
@@ -69,11 +73,12 @@ const ScheduleScreen = () => {
     
     const teamAName = teamA?.name || 'TBD';
     const teamBName = teamB?.name || 'TBD';
-    const teamALogo = teamA?.logo || 'https://placehold.co/60/222/white?text=?';
-    const teamBLogo = teamB?.logo || 'https://placehold.co/60/222/white?text=?';
+    
+    const teamALogo = TEAM_LOGOS[teamA?.acronym] ? TEAM_LOGOS[teamA?.acronym] : (teamA?.logo ? { uri: teamA.logo } : { uri: `https://placehold.co/60/222/white?text=${teamA?.acronym || '?'}` });
+    const teamBLogo = TEAM_LOGOS[teamB?.acronym] ? TEAM_LOGOS[teamB?.acronym] : (teamB?.logo ? { uri: teamB.logo } : { uri: `https://placehold.co/60/222/white?text=${teamB?.acronym || '?'}` });
 
     return (
-      <View key={match.id} style={[styles.matchCard, isLive && styles.liveBorder]}>
+      <View key={match.id} style={[styles.matchCard, isWeb && styles.matchCardWeb, isLive && styles.liveBorder]}>
         <View style={styles.cardHeader}>
           <View style={styles.leagueInfo}>
             {match.leagueLogo && <Image source={{ uri: match.leagueLogo }} style={styles.leagueLogo} />}
@@ -90,7 +95,7 @@ const ScheduleScreen = () => {
 
         <View style={styles.scoreRow}>
           <View style={styles.teamInfo}>
-            <Image source={{ uri: teamALogo }} style={styles.teamLogo} />
+            <Image source={teamALogo} style={styles.teamLogo} />
             <Text style={styles.teamName}>{teamAName}</Text>
           </View>
 
@@ -110,12 +115,20 @@ const ScheduleScreen = () => {
           </View>
 
           <View style={styles.teamInfo}>
-            <Image source={{ uri: teamBLogo }} style={styles.teamLogo} />
+            <Image source={teamBLogo} style={styles.teamLogo} />
             <Text style={styles.teamName}>{teamBName}</Text>
           </View>
         </View>
 
-        <TouchableOpacity style={isLive ? styles.watchBtn : styles.reminderBtn}>
+        <TouchableOpacity 
+          style={isLive ? styles.watchBtn : styles.reminderBtn}
+          onPress={() => {
+            if (isLive) {
+              const url = match.streamUrl || `https://www.youtube.com/results?search_query=${encodeURIComponent(match.name + ' MLBB Live')}`;
+              Linking.openURL(url);
+            }
+          }}
+        >
           <Text style={isLive ? styles.watchText : styles.reminderText}>
             {isLive ? 'WATCH STREAM' : 'ADD TO CALENDAR'}
           </Text>
@@ -155,13 +168,17 @@ const ScheduleScreen = () => {
             {liveMatches.length > 0 && (
               <View style={{ marginBottom: 20 }}>
                 <Text style={styles.sectionTitle}>LIVE IN {selectedRegion.name}</Text>
-                {liveMatches.map(m => renderMatchCard(m, true))}
+                <View style={isWeb ? styles.gridContainer : undefined}>
+                  {liveMatches.map(m => renderMatchCard(m, true))}
+                </View>
               </View>
             )}
 
             <Text style={styles.sectionTitle}>UPCOMING TOURNAMENTS</Text>
             {upcomingMatches.length > 0 ? (
-              upcomingMatches.map(m => renderMatchCard(m, false))
+              <View style={isWeb ? styles.gridContainer : undefined}>
+                {upcomingMatches.map(m => renderMatchCard(m, false))}
+              </View>
             ) : (
               <View style={styles.emptyContainer}>
                 <Ionicons name="calendar-outline" size={40} color="#222" />
@@ -218,11 +235,15 @@ const styles = StyleSheet.create({
   regionBadgeText: { color: 'white', fontSize: 8, fontWeight: 'bold' },
 
   heroContainer: { paddingHorizontal: 30, marginVertical: 20 },
-  heroTitle: { color: 'white', fontSize: 42, fontWeight: 'bold', lineHeight: 45 },
+  heroTitle: { color: 'white', fontSize: isWeb ? 52 : 42, fontWeight: 'bold', lineHeight: isWeb ? 55 : 45 },
 
   sectionTitle: { color: 'white', fontSize: 11, fontWeight: 'bold', letterSpacing: 2, marginHorizontal: 20, marginBottom: 15, opacity: 0.4 },
   
+  // Grid implementation for Web
+  gridContainer: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 10 },
   matchCard: { backgroundColor: '#111', marginHorizontal: 20, padding: 20, borderRadius: 12, marginBottom: 15, borderWidth: 1, borderColor: '#1a1a1a' },
+  matchCardWeb: { width: 'calc(50% - 30px)', marginHorizontal: 10, marginVertical: 10 }, // 2 columns
+
   liveBorder: { borderColor: PALETTE.redNeon },
   
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
@@ -261,7 +282,7 @@ const styles = StyleSheet.create({
   lastUpdate: { color: 'white', fontSize: 8, marginTop: 5 },
 
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'center', alignItems: 'center' },
-  modalContent: { width: '80%', backgroundColor: '#111', borderRadius: 20, padding: 25, borderWidth: 1, borderColor: '#222' },
+  modalContent: { width: isWeb ? 400 : '80%', backgroundColor: '#111', borderRadius: 20, padding: 25, borderWidth: 1, borderColor: '#222' },
   modalTitle: { color: 'white', fontSize: 18, fontWeight: 'bold', marginBottom: 20, textAlign: 'center', letterSpacing: 2 },
   regionItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 15, borderBottomWidth: 1, borderBottomColor: '#222' },
   selectedRegionItem: { backgroundColor: '#1a1010', paddingHorizontal: 10, borderRadius: 8 },
