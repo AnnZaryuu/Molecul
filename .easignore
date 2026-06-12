@@ -7,7 +7,6 @@ node_modules/
 .expo/
 dist/
 web-build/
-build/
 expo-env.d.ts
 .metro-health-check*
 
@@ -33,7 +32,6 @@ expo-env.d.ts
 .env.development.local
 .env.test.local
 .env.production.local
-src/services/config.js
 *.pem
 
 # --- DEBUG & LOGS ---

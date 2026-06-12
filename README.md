@@ -1,4 +1,3 @@
 # PROJECT MOLECUL
 ---
-![Preview](assets/gayuh.jpg
-)
+![Preview](assets/gayuh.jpg)

@@ -9,16 +9,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { PALETTE } from '../theme/theme';
 import { MLBBApiService } from '../services/mlbbApiService';
+import PatchNotesCarousel from '../components/PatchNotesCarousel';
 
 const ROLES = ['ALL', 'Tank', 'Fighter', 'Assassin', 'Mage', 'Marksman', 'Support'];
 const isWeb = Platform.OS === 'web';
 
 const HeroDatabaseScreen = ({ navigation }) => {
   const { width } = useWindowDimensions();
-  const numColumns = isWeb ? 6 : 3;
-  const cardWidth = isWeb
-    ? (width - 220 - 40 - (numColumns * 10)) / numColumns  // 220=sidebar, 40=padding
-    : (width - 20 - (numColumns * 10)) / numColumns;
+  const availableWidth = isWeb ? Math.max(300, width - 240) : width - 20;
+  // Increase base width divisor on web so cards are larger and text fits
+  const numColumns = isWeb ? Math.max(3, Math.floor(availableWidth / 160)) : 3;
+  const cardWidth = (availableWidth - (numColumns * 10)) / numColumns;
     
   const [heroes, setHeroes] = useState([]);
   const [filteredHeroes, setFilteredHeroes] = useState([]);
@@ -151,7 +152,7 @@ const HeroDatabaseScreen = ({ navigation }) => {
                   <Text style={styles.roleTagText}>{(item.type || 'FIGHTER').toUpperCase()}</Text>
                 </View>
               </View>
-              <Text style={styles.heroName} numberOfLines={1}>{(item.name || '').toUpperCase()}</Text>
+              <Text style={styles.heroName} numberOfLines={2}>{(item.name || '').toUpperCase()}</Text>
             </TouchableOpacity>
           )}
           keyExtractor={(item, index) => item.id?.toString() || index.toString()}
@@ -165,6 +166,7 @@ const HeroDatabaseScreen = ({ navigation }) => {
               <Text style={styles.loadingText}>NO DATA IN THIS SECTOR</Text>
             </View>
           )}
+          ListHeaderComponent={<PatchNotesCarousel />}
         />
       )}
     </SafeAreaView>
@@ -209,11 +211,11 @@ const styles = StyleSheet.create({
   heroImage: { width: '100%', height: '100%', borderRadius: 8, backgroundColor: '#111' },
   roleTag: { 
     position: 'absolute', bottom: 0, left: 0, right: 0, 
-    backgroundColor: 'rgba(0,0,0,0.7)', paddingVertical: 3,
+    backgroundColor: 'rgba(0,0,0,0.8)', paddingVertical: 4,
     borderBottomLeftRadius: 8, borderBottomRightRadius: 8
   },
-  roleTagText: { color: PALETTE.redNeon, fontSize: 7, fontWeight: '900', textAlign: 'center' },
-  heroName: { color: 'white', fontSize: 10, fontWeight: 'bold' },
+  roleTagText: { color: PALETTE.redNeon, fontSize: isWeb ? 9 : 7, fontWeight: '900', textAlign: 'center', letterSpacing: 0.5 },
+  heroName: { color: 'white', fontSize: isWeb ? 13 : 10, fontWeight: 'bold', textAlign: 'center', marginTop: 4 },
 
   loaderContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
   loadingText: { color: '#444', fontSize: 10, fontWeight: 'bold', marginTop: 15, letterSpacing: 2 }

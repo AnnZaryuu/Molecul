@@ -5,9 +5,18 @@
  */
 
 import { PANDASCORE_TOKEN } from './config';
+import { Platform } from 'react-native';
 
 const PANDASCORE_URL = 'https://api.pandascore.co';
 const MLBB_API_BASE = 'https://mlbb.rone.dev/api';
+
+const fetchRoneDev = async (endpoint) => {
+  const url = `${MLBB_API_BASE}${endpoint}`;
+  const finalUrl = Platform.OS === 'web'
+    ? `https://corsproxy.io/?${encodeURIComponent(url)}`
+    : url;
+  return fetch(finalUrl);
+};
 
 /**
  * PETA ROLE MANUAL (FALLBACK)
@@ -15,30 +24,138 @@ const MLBB_API_BASE = 'https://mlbb.rone.dev/api';
  * kita memetakan beberapa hero terkenal secara manual.
  */
 const ROLE_MAP = {
-  'Miya': 'Marksman', 'Balmond': 'Fighter', 'Saber': 'Assassin', 'Alice': 'Mage', 'Nana': 'Support',
-  'Tigreal': 'Tank', 'Alucard': 'Fighter', 'Karina': 'Assassin', 'Akai': 'Tank', 'Franco': 'Tank',
-  'Bane': 'Fighter', 'Bruno': 'Marksman', 'Clint': 'Marksman', 'Rafaela': 'Support', 'Eudora': 'Mage', 'Zilong': 'Fighter',
-  'Fanny': 'Assassin', 'Layla': 'Marksman', 'Minotaur': 'Tank', 'Lolita': 'Tank', 'Hayabusa': 'Assassin',
-  'Freya': 'Fighter', 'Gord': 'Mage', 'Natalia': 'Assassin', 'Kagura': 'Mage', 'Chou': 'Fighter',
-  'Sun': 'Fighter', 'Alpha': 'Fighter', 'Ruby': 'Fighter', 'Yi Sun-shin': 'Marksman', 'Moskov': 'Marksman',
-  'Johnson': 'Tank', 'Cyclops': 'Mage', 'Estes': 'Support', 'Hilda': 'Fighter', 'Aurora': 'Mage',
-  'Lapu-Lapu': 'Fighter', 'Vexana': 'Mage', 'Roger': 'Fighter', 'Karrie': 'Marksman', 'Gatotkaca': 'Tank',
-  'Argus': 'Fighter', 'Diggie': 'Support', 'Irithel': 'Marksman', 'Grock': 'Tank', 'Odette': 'Mage',
-  'Lancelot': 'Assassin', 'Pharsa': 'Mage', 'Jawhead': 'Fighter', 'Angela': 'Support', 'Gusion': 'Assassin',
-  'Valir': 'Mage', 'Martis': 'Fighter', 'Uranus': 'Tank', 'Hanabi': 'Marksman', 'Chang\'e': 'Mage',
-  'Kaja': 'Support', 'Selena': 'Assassin', 'Aldous': 'Fighter', 'Claude': 'Marksman', 'Vale': 'Mage',
-  'Leomord': 'Fighter', 'Lunox': 'Mage', 'Hanzo': 'Assassin', 'Belerick': 'Tank', 'Kimmy': 'Marksman',
-  'Thamuz': 'Fighter', 'Harith': 'Mage', 'Minsitthar': 'Fighter', 'Kadita': 'Mage', 'Faramis': 'Support', 'Badang': 'Fighter',
-  'Khufra': 'Tank', 'Granger': 'Marksman', 'Guinevere': 'Fighter', 'Esmeralda': 'Mage', 'Terizla': 'Fighter',
-  'X.Borg': 'Fighter', 'Ling': 'Assassin', 'Dyrroth': 'Fighter', 'Lylia': 'Mage', 'Baxia': 'Tank',
-  'Masha': 'Fighter', 'Wanwan': 'Marksman', 'Silvanna': 'Fighter', 'Cecilion': 'Mage', 'Carmilla': 'Support',
-  'Atlas': 'Tank', 'Popol and Kupa': 'Marksman', 'Yu Zhong': 'Fighter', 'Luo Yi': 'Mage', 'Benedetta': 'Assassin',
-  'Khaleed': 'Fighter', 'Barats': 'Tank', 'Brody': 'Marksman', 'Yve': 'Mage', 'Mathilda': 'Support',
-  'Paquito': 'Fighter', 'Gloo': 'Tank', 'Beatrix': 'Marksman', 'Phoveus': 'Fighter', 'Natan': 'Marksman',
-  'Aulus': 'Fighter', 'Aamon': 'Assassin', 'Valentina': 'Mage', 'Edith': 'Tank', 'Yin': 'Fighter',
-  'Melissa': 'Marksman', 'Xavier': 'Mage', 'Julian': 'Fighter', 'Fredrinn': 'Tank', 'Joy': 'Assassin',
-  'Novaria': 'Mage', 'Arlott': 'Fighter', 'Ixia': 'Marksman', 'Nolan': 'Assassin', 'Cici': 'Fighter',
-  'Chip': 'Support', 'Suyou': 'Assassin', 'Zhuxin': 'Mage', 'Marcel': 'Support', 'Lukas': 'Fighter'
+  'Miya': 'Marksman',
+  'Balmond': 'Fighter',
+  'Saber': 'Assassin',
+  'Alice': 'Mage',
+  'Nana': 'Support',
+  'Tigreal': 'Tank',
+  'Alucard': 'Fighter',
+  'Karina': 'Assassin',
+  'Akai': 'Tank',
+  'Franco': 'Tank',
+  'Bane': 'Fighter',
+  'Bruno': 'Marksman',
+  'Clint': 'Marksman',
+  'Rafaela': 'Support',
+  'Eudora': 'Mage',
+  'Zilong': 'Fighter',
+  'Fanny': 'Assassin',
+  'Layla': 'Marksman',
+  'Minotaur': 'Tank',
+  'Lolita': 'Tank',
+  'Hayabusa': 'Assassin',
+  'Freya': 'Fighter',
+  'Gord': 'Mage',
+  'Natalia': 'Assassin',
+  'Kagura': 'Mage',
+  'Chou': 'Fighter',
+  'Sun': 'Fighter',
+  'Alpha': 'Fighter',
+  'Ruby': 'Fighter',
+  'Yi Sun-shin': 'Marksman',
+  'Moskov': 'Marksman',
+  'Johnson': 'Tank',
+  'Cyclops': 'Mage',
+  'Estes': 'Support',
+  'Hilda': 'Fighter',
+  'Aurora': 'Mage',
+  'Lapu-Lapu': 'Fighter',
+  'Vexana': 'Mage',
+  'Roger': 'Fighter',
+  'Karrie': 'Marksman',
+  'Gatotkaca': 'Tank',
+  'Argus': 'Fighter',
+  'Diggie': 'Support',
+  'Irithel': 'Marksman',
+  'Grock': 'Tank',
+  'Odette': 'Mage',
+  'Lancelot': 'Assassin',
+  'Pharsa': 'Mage',
+  'Jawhead': 'Fighter',
+  'Angela': 'Support',
+  'Gusion': 'Assassin',
+  'Valir': 'Mage',
+  'Martis': 'Fighter',
+  'Uranus': 'Tank',
+  'Hanabi': 'Marksman',
+  'Chang\'e': 'Mage',
+  'Kaja': 'Support',
+  'Selena': 'Assassin',
+  'Aldous': 'Fighter',
+  'Claude': 'Marksman',
+  'Vale': 'Mage',
+  'Leomord': 'Fighter',
+  'Lunox': 'Mage',
+  'Hanzo': 'Assassin',
+  'Belerick': 'Tank',
+  'Kimmy': 'Marksman',
+  'Thamuz': 'Fighter',
+  'Harith': 'Mage',
+  'Minsitthar': 'Fighter',
+  'Kadita': 'Mage',
+  'Faramis': 'Support',
+  'Badang': 'Fighter',
+  'Khufra': 'Tank',
+  'Granger': 'Marksman',
+  'Guinevere': 'Fighter',
+  'Esmeralda': 'Mage',
+  'Terizla': 'Fighter',
+  'X.Borg': 'Fighter',
+  'Ling': 'Assassin',
+  'Dyrroth': 'Fighter',
+  'Lylia': 'Mage',
+  'Baxia': 'Tank',
+  'Masha': 'Fighter',
+  'Wanwan': 'Marksman',
+  'Silvanna': 'Fighter',
+  'Cecilion': 'Mage',
+  'Carmilla': 'Support',
+  'Atlas': 'Tank',
+  'Popol and Kupa': 'Marksman',
+  'Yu Zhong': 'Fighter',
+  'Luo Yi': 'Mage',
+  'Benedetta': 'Assassin',
+  'Khaleed': 'Fighter',
+  'Barats': 'Tank',
+  'Brody': 'Marksman',
+  'Yve': 'Mage',
+  'Mathilda': 'Support',
+  'Paquito': 'Fighter',
+  'Gloo': 'Tank',
+  'Beatrix': 'Marksman',
+  'Phoveus': 'Fighter',
+  'Natan': 'Marksman',
+  'Aulus': 'Fighter',
+  'Aamon': 'Assassin',
+  'Valentina': 'Mage',
+  'Edith': 'Tank',
+  'Yin': 'Fighter',
+  'Melissa': 'Marksman',
+  'Xavier': 'Mage',
+  'Julian': 'Fighter',
+  'Fredrinn': 'Tank',
+  'Joy': 'Assassin',
+  'Novaria': 'Mage',
+  'Arlott': 'Fighter',
+  'Ixia': 'Marksman',
+  'Nolan': 'Assassin',
+  'Cici': 'Fighter',
+  'Chip': 'Support',
+  'Zhuxin': 'Mage',
+  'Suyou': 'Assassin',
+  'Lukas': 'Fighter',
+  'Kalea': 'Support',
+  'Sora': 'Marksman',
+  'Obsidia': 'Mage',
+  'Zetian': 'Mage',
+  'Floryn': 'Support',
+  'Harley': 'Mage',
+  'Helcurt': 'Assassin',
+  'Hylos': 'Tank',
+  'Zhask': 'Mage',
+  'Lesley': 'Marksman',
+  'Marcel': 'Support'
 };
 
 /**
@@ -58,12 +175,12 @@ export const MLBBApiService = {
    */
   getHeroes: async () => {
     try {
-      const response = await fetch(`${MLBB_API_BASE}/heroes?size=200`);
+      const response = await fetchRoneDev('/heroes?size=200');
       if (!response.ok) {
         console.warn(`Heroes API returned status ${response.status}`);
         return [];
       }
-      
+
       const resData = await response.json();
       const records = resData.data?.records || [];
 
@@ -75,6 +192,7 @@ export const MLBBApiService = {
           id: record.data?.hero_id?.toString() || heroData?.heroid?.toString(),
           name: heroData?.name,
           head: heroData?.head || '',
+          smallmap: heroData?.smallmap || '',
           type: type
         };
       });
@@ -89,7 +207,7 @@ export const MLBBApiService = {
    */
   getHeroDetails: async (heroId) => {
     try {
-      const response = await fetch(`${MLBB_API_BASE}/heroes/${heroId}`);
+      const response = await fetchRoneDev(`/heroes/${heroId}`);
       if (!response.ok) {
         console.warn(`Hero detail API returned status ${response.status}`);
         return null;
@@ -97,7 +215,7 @@ export const MLBBApiService = {
       const resData = await response.json();
       const records = resData.data?.records || [];
       if (records.length === 0) return null;
-      
+
       const record = records[0];
       const data = record.data?.hero?.data;
       if (!data) return null;
@@ -161,17 +279,22 @@ export const MLBBApiService = {
    */
   getMLBBMatches: async (status = 'upcoming', pageSize = 10) => {
     try {
-      // Map 'not_started' to 'upcoming' for PandaScore compatibility
-      const apiStatus = status === 'not_started' ? 'upcoming' : status;
-      
+      // Map 'not_started' to 'upcoming' and 'finished' to 'past' for PandaScore compatibility
+      let apiStatus = status;
+      if (status === 'not_started') apiStatus = 'upcoming';
+      if (status === 'finished') apiStatus = 'past';
+
       if (!PANDASCORE_TOKEN || PANDASCORE_TOKEN === 'YOUR_PANDASCORE_TOKEN_HERE') {
         console.warn('PandaScore token is missing or invalid.');
         return [];
       }
 
-      const response = await fetch(`${PANDASCORE_URL}/mlbb/matches/${apiStatus}?token=${PANDASCORE_TOKEN}&per_page=${pageSize}&sort=begin_at`);
+      // PandaScore MLBB Matches endpoint. Standard format is /matches/{status}?filter[videogame]=mlbb
+      // Using /matches/upcoming?token=X&filter[videogame]=mlbb
+      const sortParam = apiStatus === 'past' ? '-begin_at' : 'begin_at';
+      const response = await fetch(`${PANDASCORE_URL}/matches/${apiStatus}?token=${PANDASCORE_TOKEN}&filter[videogame]=mlbb&per_page=${pageSize}&sort=${sortParam}`);
       const data = await response.json();
-      
+
       if (!Array.isArray(data)) {
         console.warn('PandaScore matches returned non-array:', data);
         return [];
@@ -218,21 +341,21 @@ export const MLBBApiService = {
   getMLBBStandings: async (tournamentSlug) => {
     try {
       if (!tournamentSlug) return [];
-      
+
       if (!PANDASCORE_TOKEN || PANDASCORE_TOKEN === 'YOUR_PANDASCORE_TOKEN_HERE') {
         console.warn('PandaScore token is missing or invalid.');
         return [];
       }
 
       const response = await fetch(`${PANDASCORE_URL}/tournaments/${tournamentSlug}/standings?token=${PANDASCORE_TOKEN}`);
-      
+
       if (!response.ok) {
         console.warn(`PandaScore error ${response.status} for ${tournamentSlug}`);
         return [];
       }
 
       const data = await response.json();
-      
+
       if (!Array.isArray(data)) {
         console.warn('PandaScore standings returned non-array:', data);
         return [];
@@ -243,7 +366,7 @@ export const MLBBApiService = {
         let name = team.name || 'UNKNOWN';
         // Data Correction Layer
         if (name === 'Fnatic ONIC') name = 'ONIC';
-        
+
         return {
           id: team.id,
           rank: item.rank,
@@ -269,12 +392,12 @@ export const MLBBApiService = {
     try {
       const response = await fetch(`${PANDASCORE_URL}/mlbb/teams?token=${PANDASCORE_TOKEN}&per_page=${pageSize}`);
       const data = await response.json();
-      
+
       return data.map(team => {
         let name = team.name;
         // Data Correction Layer
         if (name === 'Fnatic ONIC') name = 'ONIC';
-        
+
         return {
           id: team.id,
           name: name,

@@ -61,9 +61,26 @@ const ScheduleScreen = () => {
 
   const formatTime = (isoString) => {
     const date = new Date(isoString);
-    const day = date.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
-    const time = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    return `${day} ${time}`;
+    
+    const now = new Date();
+    const jakartaMatchDate = date.toLocaleDateString('en-US', { timeZone: 'Asia/Jakarta' });
+    const jakartaToday = now.toLocaleDateString('en-US', { timeZone: 'Asia/Jakarta' });
+    
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const jakartaTomorrow = tomorrow.toLocaleDateString('en-US', { timeZone: 'Asia/Jakarta' });
+
+    let dayStr;
+    if (jakartaMatchDate === jakartaToday) {
+      dayStr = 'TODAY';
+    } else if (jakartaMatchDate === jakartaTomorrow) {
+      dayStr = 'TOMORROW';
+    } else {
+      dayStr = date.toLocaleDateString('en-US', { weekday: 'short', timeZone: 'Asia/Jakarta' }).toUpperCase();
+    }
+
+    const timeStr = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta', hour12: false });
+    return `${dayStr} ${timeStr} WIB`;
   };
 
   const renderMatchCard = (match, isLive = false) => {
@@ -261,12 +278,12 @@ const styles = StyleSheet.create({
   teamLogo: { width: 50, height: 50, resizeMode: 'contain', marginBottom: 10 },
   teamName: { color: 'white', fontSize: 11, fontWeight: 'bold', textAlign: 'center' },
 
-  scoreCounter: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  scoreCounter: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '30%', gap: 10 },
   scoreActive: { color: 'white', fontSize: 24, fontWeight: 'bold' },
   vsText: { color: '#333', fontSize: 20, fontWeight: 'bold' },
-  vsContainer: { alignItems: 'center' },
-  vsLarge: { color: '#222', fontSize: 18, fontWeight: 'bold' },
-  timeText: { color: PALETTE.redNeon, fontSize: 12, fontWeight: 'bold', marginBottom: 4 },
+  vsContainer: { alignItems: 'center', width: '100%' },
+  vsLarge: { color: '#222', fontSize: 18, fontWeight: 'bold', textAlign: 'center' },
+  timeText: { color: PALETTE.redNeon, fontSize: 11, fontWeight: 'bold', marginBottom: 4, textAlign: 'center' },
 
   watchBtn: { backgroundColor: PALETTE.redNeon, paddingVertical: 10, borderRadius: 6 },
   watchText: { color: 'white', textAlign: 'center', fontWeight: 'bold', fontSize: 10 },

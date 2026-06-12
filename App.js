@@ -48,7 +48,7 @@ const withTabTransition = (ScreenComponent) => {
 };
 
 const TournamentHubAnimated = withTabTransition(TournamentHubScreen);
-const ScheduleAnimated = withTabTransition(ScheduleScreen);
+const ScheduleAnimated       = withTabTransition(ScheduleScreen);
 
 // ── Hero Stack ────────────────────────────────────────────────────────────────
 const forCardExpand = ({ current }) => ({
@@ -175,7 +175,7 @@ export default function App() {
                   }}}
                 >
                   <Tab.Screen name="TOURNEY" component={TournamentHubAnimated} />
-                  <Tab.Screen name="HEROES" component={HeroStackAnimated} />
+                  <Tab.Screen name="HEROES"  component={HeroStackAnimated} />
                   <Tab.Screen name="SCHEDULE" component={ScheduleAnimated} />
                 </Tab.Navigator>
               </View>
@@ -194,16 +194,16 @@ export default function App() {
                 tabBarButton: (props) => <AnimatedTabButton {...props} />,
                 tabBarIcon: ({ color, focused }) => {
                   let iconName;
-                  if (route.name === 'TOURNEY') iconName = focused ? 'trophy' : 'trophy-outline';
+                  if (route.name === 'TOURNEY')  iconName = focused ? 'trophy' : 'trophy-outline';
                   else if (route.name === 'SCHEDULE') iconName = focused ? 'calendar' : 'calendar-outline';
-                  else if (route.name === 'HEROES') iconName = focused ? 'shield-half' : 'shield-half-outline';
+                  else if (route.name === 'HEROES')   iconName = focused ? 'shield-half' : 'shield-half-outline';
                   return <Ionicons name={iconName} size={20} color={color} />;
                 },
               })}
             >
-              <Tab.Screen name="TOURNEY" component={TournamentHubAnimated} options={{ tabBarLabel: 'TOURNEY' }} />
-              <Tab.Screen name="HEROES" component={HeroStackAnimated} options={{ tabBarLabel: 'HEROES' }} />
-              <Tab.Screen name="SCHEDULE" component={ScheduleAnimated} options={{ tabBarLabel: 'SCHEDULE' }} />
+              <Tab.Screen name="TOURNEY"  component={TournamentHubAnimated}  options={{ tabBarLabel: 'TOURNEY' }} />
+              <Tab.Screen name="HEROES"   component={HeroStackAnimated}      options={{ tabBarLabel: 'HEROES' }} />
+              <Tab.Screen name="SCHEDULE" component={ScheduleAnimated}       options={{ tabBarLabel: 'SCHEDULE' }} />
             </Tab.Navigator>
           )}
         </NavigationContainer>
