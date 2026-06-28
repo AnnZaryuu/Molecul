@@ -1,8 +1,6 @@
-# PROJECT MOLECUL
----
-![Preview](client/assets/molecul.png)
+# <img src="client/assets/molecul.png" width="80" alt="Preview" style="vertical-align: middle; margin-right: 10px;"/> PROJECT MOLECUL 
 
-## Penjelasan Teknis Singkat
+## Deskripsi
 
 Project Molecul adalah aplikasi berbasis **Enterprise Monorepo** yang mengusung teknologi *Cross-Platform* (React Native/Expo) untuk *client* dan Laravel untuk sistem *backend*. Aplikasi ini dibuat khusus untuk menjadi pendamping komprehensif bagi pemain Mobile Legends: Bang Bang, menyediakan *database* hero lengkap, pusat info turnamen e-sports, hingga sistem prediksi pertandingan (*betting*) berhadiah poin.
 
