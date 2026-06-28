@@ -1,4 +1,7 @@
-# <img src="client/assets/molecul.png" width="80" alt="Preview" style="vertical-align: middle; margin-right: 20px;"/> PROJECT MOLECUL 
+<h1 align="center">
+  <img src="client/assets/molecul.png" width="70" alt="Logo" />
+  PROJECT MOLECUL
+</h1>
 
 ## Deskripsi
 
