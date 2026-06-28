@@ -25,7 +25,7 @@ Repositori ini dibagi menjadi dua bagian utama yang sangat rapi:
 - **Prediksi Pertandingan**: Pengguna dapat bertaruh poin pada tim e-sports jagoan mereka di pertandingan dunia nyata maupun *Dummy Match*.
 - **Dasbor Admin Interaktif**: Antarmuka khusus untuk admin dalam me-*resolve* pemenang pertandingan, membuat simulasi *dummy match*, dan mengelola koin seluruh pengguna secara *in-app* dan *real-time*.
 - **Database Hero**: Mengambil data hero, atribut, dan *role* secara *real-time* dari server eksternal [![rone.dev](https://img.shields.io/badge/API-rone.dev-blue.svg)](https://github.com/ridwaanhall/api-mobilelegends).
-- **Portal E-Sports Terintegrasi**: Terhubung ke [![Pandascore](https://img.shields.io/badge/API-rone.dev-blue.svg)](https://www.pandascore.co/). untuk menarik jadwal pertandingan profesional, *live score*, dan klasemen turnamen MLBB global.
+- **Portal E-Sports Terintegrasi**: Terhubung ke [![Pandascore](https://img.shields.io/badge/API-Pandascore-blue.svg)](https://www.pandascore.co/). untuk menarik jadwal pertandingan profesional, *live score*, dan klasemen turnamen MLBB global.
 
 ## Cara Menjalankan Aplikasi
 
