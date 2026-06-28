@@ -1,7 +1,15 @@
-<h1 align="center">
-  <img src="client/assets/molecul.png" width="70" alt="Logo" />
-  PROJECT MOLECUL
-</h1>
+<table>
+<tr>
+<td width="90">
+<img src="client/assets/molecul.png" width="70">
+</td>
+<td>
+
+# PROJECT MOLECUL
+
+</td>
+</tr>
+</table>
 
 ## Deskripsi
 
