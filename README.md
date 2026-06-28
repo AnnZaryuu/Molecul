@@ -29,7 +29,7 @@ Repositori ini dibagi menjadi dua bagian utama yang sangat rapi:
 
 ## Cara Menjalankan Aplikasi
 
-Pastikan Anda sudah menginstal **PHP, Composer, MySQL, Node.js, dan npm** di sistem Anda.
+Pastikan **PHP, Composer, MySQL, Node.js, dan npm** sudah terinstal pada sistem.
 
 ### 1. Menjalankan Backend (API Laravel)
 ```bash
@@ -39,24 +39,28 @@ cp .env.example .env # Atur DB_DATABASE, DB_USERNAME, DB_PASSWORD di sini
 php artisan key:generate
 php artisan migrate
 php artisan serve
-```
+````
 
 ### 2. Menjalankan Frontend (Client Expo)
-Buka tab terminal baru (biarkan server Laravel tetap menyala):
+
+Buka terminal baru, lalu biarkan server Laravel tetap berjalan:
+
 ```bash
 cd client
 npm install
 npx expo start -c
 ```
-Untuk mengetes aplikasi, Anda dapat memindai *QR code* yang muncul menggunakan aplikasi **Expo Go** di HP fisik Anda. Alternatif lain, tekan tombol `a` di terminal untuk membuka lewat Emulator Android, atau tekan `i` untuk Simulator iOS.
+
+Pengujian aplikasi dapat dilakukan dengan memindai *QR code* menggunakan aplikasi **Expo Go** pada perangkat seluler. Alternatif lain, tekan tombol `a` di terminal untuk membuka melalui Emulator Android, atau tekan `i` untuk Simulator iOS.
 
 ## Konfigurasi Token PandaScore
 
-Supaya jadwal e-sports dan klasemen turnamen bisa muncul, diperlukan token API dari PandaScore.
+Supaya jadwal e-sports dan klasemen turnamen dapat ditampilkan, diperlukan token API dari PandaScore.
+
 1. Buat akun gratis terlebih dahulu di https://pandascore.co/
-2. Masuk ke halaman *dashboard* mereka untuk membuat API Token baru.
-3. Kembali ke proyek ini, lalu buka file `client/src/services/config.js`.
-4. Masukkan token milik Anda:
+2. Masuk ke halaman *dashboard* untuk membuat API Token baru.
+3. Buka file `client/src/services/config.js`.
+4. Masukkan API Token pada bagian berikut:
 
 ```javascript
 // client/src/services/config.js
