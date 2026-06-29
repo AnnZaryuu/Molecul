@@ -1,7 +1,7 @@
 <table>
 <tr>
 <td width="90">
-<img src="client/assets/molecul.png" width="70">
+<img src="assets/molecul.png" width="70">
 </td>
 <td>
 
