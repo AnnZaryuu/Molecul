@@ -1,6 +1,15 @@
+<table>
+<tr>
+<td width="90">
+<img src="client/assets/molecul.png" width="70">
+</td>
+<td>
+
 # PROJECT MOLECUL
----
-![Preview](assets/gayuh.jpg)
+
+</td>
+</tr>
+</table>
 
 ## Penjelasan Teknis Singkat
 
