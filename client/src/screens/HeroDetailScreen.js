@@ -201,7 +201,7 @@ const HeroDetailScreen = ({ route, navigation }) => {
         </View>
       </Animated.View>
 
-      <SafeAreaView style={styles.safeNav} pointerEvents="box-none">
+      <SafeAreaView style={[styles.safeNav, { pointerEvents: 'box-none' }]}>
         <TouchableOpacity style={styles.floatingBack} onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-back" size={24} color="white" />
         </TouchableOpacity>

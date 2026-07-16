@@ -2,8 +2,13 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
-// Gunakan IP WiFi komputer Anda agar bisa diakses dari HP fisik maupun Emulator
-const BASE_URL = 'http://192.168.1.8:8000/api';
+import Constants from 'expo-constants';
+
+// Automatically detect the IP address from Expo Go's manifest
+const debuggerHost = Constants.expoConfig?.hostUri;
+const localhost = debuggerHost ? debuggerHost.split(':')[0] : '172.18.2.49';
+
+const BASE_URL = `http://${localhost}:8000/api`;
 
 const api = axios.create({
   baseURL: BASE_URL,

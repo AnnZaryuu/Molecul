@@ -37,8 +37,8 @@ const withTabTransition = (ScreenComponent) => {
         if (hasAnimated.current) return;
         hasAnimated.current = true;
         Animated.parallel([
-          Animated.timing(opacity, { toValue: 1, duration: 180, useNativeDriver: true }),
-          Animated.spring(translateY, { toValue: 0, speed: 25, bounciness: 3, useNativeDriver: true }),
+          Animated.timing(opacity, { toValue: 1, duration: 180, useNativeDriver: Platform.OS !== 'web' }),
+          Animated.spring(translateY, { toValue: 0, speed: 25, bounciness: 3, useNativeDriver: Platform.OS !== 'web' }),
         ]).start();
       }, [])
     );
@@ -54,7 +54,7 @@ const withTabTransition = (ScreenComponent) => {
 };
 
 const TournamentHubAnimated = withTabTransition(TournamentHubScreen);
-const ScheduleAnimated       = withTabTransition(ScheduleScreen);
+const ScheduleAnimated = withTabTransition(ScheduleScreen);
 
 // ── Hero Stack ────────────────────────────────────────────────────────────────
 const forCardExpand = ({ current }) => ({
@@ -89,8 +89,8 @@ const HeroStackAnimated = withTabTransition(HeroStackBase);
 // ── Mobile Tab Button ─────────────────────────────────────────────────────────
 const AnimatedTabButton = ({ children, onPress, accessibilityState = {} }) => {
   const scale = useRef(new Animated.Value(1)).current;
-  const handlePressIn = () => Animated.spring(scale, { toValue: 0.82, useNativeDriver: true, speed: 50, bounciness: 8 }).start();
-  const handlePressOut = () => Animated.spring(scale, { toValue: 1, useNativeDriver: true, speed: 30, bounciness: 12 }).start();
+  const handlePressIn = () => Animated.spring(scale, { toValue: 0.82, useNativeDriver: Platform.OS !== 'web', speed: 50, bounciness: 8 }).start();
+  const handlePressOut = () => Animated.spring(scale, { toValue: 1, useNativeDriver: Platform.OS !== 'web', speed: 30, bounciness: 12 }).start();
   return (
     <TouchableOpacity activeOpacity={1} onPressIn={handlePressIn} onPressOut={handlePressOut} onPress={onPress} style={styles.tabButton}>
       <Animated.View style={[styles.tabButtonInner, { transform: [{ scale }] }]}>{children}</Animated.View>
@@ -201,14 +201,16 @@ function MainApp() {
                 <Tab.Navigator
                   sceneContainerStyle={{ backgroundColor: PALETTE.black }}
                   screenOptions={{ headerShown: false, tabBarStyle: { display: 'none' } }}
-                  screenListeners={{ state: (e) => {
-                    const routes = e.data.state?.routes;
-                    const idx = e.data.state?.index;
-                    if (routes && idx !== undefined) setActiveTab(routes[idx].name);
-                  }}}
+                  screenListeners={{
+                    state: (e) => {
+                      const routes = e.data.state?.routes;
+                      const idx = e.data.state?.index;
+                      if (routes && idx !== undefined) setActiveTab(routes[idx].name);
+                    }
+                  }}
                 >
                   <Tab.Screen name="TOURNEY" component={TournamentHubAnimated} />
-                  <Tab.Screen name="HEROES"  component={HeroStackAnimated} />
+                  <Tab.Screen name="HEROES" component={HeroStackAnimated} />
                   <Tab.Screen name="SCHEDULE" component={ScheduleAnimated} />
                   <Tab.Screen name="PROFILE" component={ProfileStack} />
                   {isAdmin && <Tab.Screen name="ADMIN" component={AdminDashboardScreen} />}
@@ -229,19 +231,19 @@ function MainApp() {
                 tabBarButton: (props) => <AnimatedTabButton {...props} />,
                 tabBarIcon: ({ color, focused }) => {
                   let iconName;
-                  if (route.name === 'TOURNEY')  iconName = focused ? 'trophy' : 'trophy-outline';
+                  if (route.name === 'TOURNEY') iconName = focused ? 'trophy' : 'trophy-outline';
                   else if (route.name === 'SCHEDULE') iconName = focused ? 'calendar' : 'calendar-outline';
-                  else if (route.name === 'HEROES')   iconName = focused ? 'shield-half' : 'shield-half-outline';
-                  else if (route.name === 'PROFILE')  iconName = focused ? 'person' : 'person-outline';
-                  else if (route.name === 'ADMIN')    iconName = focused ? 'shield-checkmark' : 'shield-checkmark-outline';
+                  else if (route.name === 'HEROES') iconName = focused ? 'shield-half' : 'shield-half-outline';
+                  else if (route.name === 'PROFILE') iconName = focused ? 'person' : 'person-outline';
+                  else if (route.name === 'ADMIN') iconName = focused ? 'shield-checkmark' : 'shield-checkmark-outline';
                   return <Ionicons name={iconName} size={22} color={color} />;
                 },
               })}
             >
-              <Tab.Screen name="TOURNEY"  component={TournamentHubAnimated}  options={{ tabBarLabel: 'TOURNEY' }} />
-              <Tab.Screen name="HEROES"   component={HeroStackAnimated}      options={{ tabBarLabel: 'HEROES' }} />
-              <Tab.Screen name="SCHEDULE" component={ScheduleAnimated}       options={{ tabBarLabel: 'SCHEDULE' }} />
-              <Tab.Screen name="PROFILE"  component={ProfileStack}           options={{ tabBarLabel: 'PROFILE' }} />
+              <Tab.Screen name="TOURNEY" component={TournamentHubAnimated} options={{ tabBarLabel: 'TOURNEY' }} />
+              <Tab.Screen name="HEROES" component={HeroStackAnimated} options={{ tabBarLabel: 'HEROES' }} />
+              <Tab.Screen name="SCHEDULE" component={ScheduleAnimated} options={{ tabBarLabel: 'SCHEDULE' }} />
+              <Tab.Screen name="PROFILE" component={ProfileStack} options={{ tabBarLabel: 'PROFILE' }} />
               {isAdmin && (
                 <Tab.Screen name="ADMIN" component={AdminDashboardScreen} options={{ tabBarLabel: 'ADMIN' }} />
               )}
@@ -324,7 +326,7 @@ const ProfileStackNav = createStackNavigator();
 
 function ProfileStack() {
   const { userToken } = React.useContext(AuthContext);
-  
+
   return (
     <ProfileStackNav.Navigator screenOptions={{ headerShown: false }}>
       {userToken && userToken !== 'GUEST' ? (

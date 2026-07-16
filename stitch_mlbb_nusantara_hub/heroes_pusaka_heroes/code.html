@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Anybody:wght@100..900&amp;family=Plus+Jakarta+Sans:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #121414;
+            color: #e2e2e2;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+
+        .batik-frame {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            width: 5px;
+            z-index: 100;
+            background: linear-gradient(to bottom, #f2ca50 0%, #3c2f00 50%, #f2ca50 100%);
+            opacity: 0.4;
+        }
+        .batik-frame-left { left: 0; }
+        .batik-frame-right { right: 0; }
+
+        .parang-overlay {
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40' fill='%23f2ca50' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+
+        .hero-card-clip {
+            clip-path: polygon(0 0, 85% 0, 100% 15%, 100% 100%, 0 100%);
+        }
+
+        .gold-glow {
+            box-shadow: 0 0 15px rgba(242, 202, 80, 0.2);
+        }
+
+        .candi-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #f2ca50, transparent);
+            position: relative;
+            margin: 1rem 0;
+        }
+        .candi-divider::after {
+            content: '◆';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            color: #f2ca50;
+            font-size: 10px;
+            background: #121414;
+            padding: 0 8px;
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .active-tab-glow {
+            background: radial-gradient(circle, rgba(242, 202, 80, 0.15) 0%, transparent 70%);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#121414",
+                        "error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#474746",
+                        "primary-fixed": "#ffe088",
+                        "on-surface": "#e2e2e2",
+                        "outline-variant": "#4d4635",
+                        "secondary": "#ffb4ac",
+                        "tertiary": "#d0cdcd",
+                        "surface-container-low": "#1a1c1c",
+                        "surface-variant": "#333535",
+                        "inverse-surface": "#e2e2e2",
+                        "secondary-fixed": "#ffdad6",
+                        "on-secondary-container": "#ff9f95",
+                        "secondary-fixed-dim": "#ffb4ac",
+                        "surface-container-high": "#282a2b",
+                        "secondary-container": "#960711",
+                        "on-tertiary": "#313030",
+                        "on-primary-fixed": "#241a00",
+                        "tertiary-container": "#b4b2b2",
+                        "on-primary": "#3c2f00",
+                        "on-error-container": "#ffdad6",
+                        "surface-bright": "#38393a",
+                        "primary-fixed-dim": "#e9c349",
+                        "outline": "#99907c",
+                        "tertiary-fixed-dim": "#c8c6c5",
+                        "on-primary-container": "#554300",
+                        "surface-container-highest": "#333535",
+                        "on-error": "#690005",
+                        "primary": "#f2ca50",
+                        "error": "#ffb4ab",
+                        "on-secondary": "#690007",
+                        "surface-container": "#1e2020",
+                        "on-background": "#e2e2e2",
+                        "surface": "#121414",
+                        "tertiary-fixed": "#e5e2e1",
+                        "background": "#121414",
+                        "inverse-on-surface": "#2f3131",
+                        "inverse-primary": "#735c00",
+                        "surface-container-lowest": "#0c0f0f",
+                        "on-tertiary-fixed": "#1c1b1b",
+                        "primary-container": "#d4af37",
+                        "on-tertiary-container": "#454544",
+                        "surface-tint": "#e9c349",
+                        "on-primary-fixed-variant": "#574500",
+                        "on-surface-variant": "#d0c5af",
+                        "on-secondary-fixed": "#410003",
+                        "on-secondary-fixed-variant": "#92030f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "sm": "12px",
+                        "xs": "8px",
+                        "xl": "32px",
+                        "gutter": "16px",
+                        "md": "16px",
+                        "base": "4px",
+                        "lg": "24px",
+                        "margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Anybody"],
+                        "label-bold": ["Plus Jakarta Sans"],
+                        "stat-value": ["Anybody"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Anybody"],
+                        "headline-lg-mobile": ["Anybody"],
+                        "body-md": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "label-bold": ["12px", {"lineHeight": "16px", "fontWeight": "700"}],
+                        "stat-value": ["18px", {"lineHeight": "22px", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "headline-lg-mobile": ["26px", {"lineHeight": "32px", "fontWeight": "800"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="parang-overlay">
+<!-- Batik Frames -->
+<div class="batik-frame batik-frame-left"></div>
+<div class="batik-frame batik-frame-right"></div>
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 bg-surface shadow-sm border-b border-outline-variant h-16 flex items-center justify-between px-margin-mobile max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full border border-primary overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A portrait of a distinguished user with Indonesian features, framed in a gold filigree circular border. The lighting is dramatic and heroic, reflecting a high-tier competitive gaming profile. The background is a deep, textured charcoal with subtle gold dust particles floating in the air." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-44xiM9UqslE7854yWl55fftgr9etWf31lUQevirig7QvJeZIYVMrvvzL8hln1yNniMlhMfLjS6YHA-F90PHV-3iQ5_E6vKXMRoQDiPE2QY7AMWtnSX_Dd0kotP5_pC3ietDSdY9Cm7sMOyMlU-_-b6Z6Z2A9eFWN7IhBKd4RFCMxcQmqo1su8kfQYd6eeIZjj_q_FyhbDe7eviIhFpuNsTZtXeBVqg6bughbBDaJ2S4gY_VFK6FoVhVnMRAwQdjhGB-3u65Sb5p_"/>
+</div>
+<h1 class="font-headline-md text-headline-md font-extrabold text-primary tracking-wider">PUSAKA HEROES</h1>
+</div>
+<button class="text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-150">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</header>
+<main class="pt-20 pb-32 px-margin-mobile min-h-screen">
+<!-- Search & Filter Section -->
+<section class="mb-lg space-y-md">
+<!-- Search Bar -->
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-surface-container-high border border-outline-variant rounded-xl py-3 pl-12 pr-4 text-body-md focus:outline-none focus:border-primary transition-all placeholder:text-on-surface-variant/50" placeholder="Cari Pusaka Rimba..." type="text"/>
+</div>
+<!-- Role Filters -->
+<div class="flex gap-xs overflow-x-auto pb-2 no-scrollbar -mx-margin-mobile px-margin-mobile">
+<button class="flex-shrink-0 px-4 py-2 bg-primary text-on-primary-container font-label-bold text-label-bold rounded-full shadow-lg">Semua</button>
+<button class="flex-shrink-0 px-4 py-2 bg-surface-container-highest text-on-surface-variant font-label-bold text-label-bold rounded-full border border-outline-variant hover:border-primary transition-colors">Tank</button>
+<button class="flex-shrink-0 px-4 py-2 bg-surface-container-highest text-on-surface-variant font-label-bold text-label-bold rounded-full border border-outline-variant hover:border-primary transition-colors">Fighter</button>
+<button class="flex-shrink-0 px-4 py-2 bg-surface-container-highest text-on-surface-variant font-label-bold text-label-bold rounded-full border border-outline-variant hover:border-primary transition-colors">Assassin</button>
+<button class="flex-shrink-0 px-4 py-2 bg-surface-container-highest text-on-surface-variant font-label-bold text-label-bold rounded-full border border-outline-variant hover:border-primary transition-colors">Mage</button>
+<button class="flex-shrink-0 px-4 py-2 bg-surface-container-highest text-on-surface-variant font-label-bold text-label-bold rounded-full border border-outline-variant hover:border-primary transition-colors">Marksman</button>
+<button class="flex-shrink-0 px-4 py-2 bg-surface-container-highest text-on-surface-variant font-label-bold text-label-bold rounded-full border border-outline-variant hover:border-primary transition-colors">Support</button>
+</div>
+</section>
+<div class="candi-divider"></div>
+<!-- Hero Grid -->
+<section class="grid grid-cols-2 gap-gutter">
+<!-- Hero Card: Gatotkaca -->
+<div class="relative group">
+<div class="hero-card-clip bg-surface-container border border-primary/20 overflow-hidden gold-glow transition-transform duration-300 active:scale-95">
+<div class="h-48 relative">
+<img class="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-500" data-alt="A powerful legendary Indonesian warrior character with glowing golden armor and traditional elements, inspired by Gatotkaca. He is surrounded by mystical energy in a dark, atmospheric setting. The style is hyper-detailed digital art with high contrast, deep shadows, and radiant gold light effects typical of premium mobile game character portraits." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAg5eCATWSW-QjJOiKk6WyGvVJOGPYM26eXCqg_3n5-9ghbiBINKuUaxnbb9DwyzlSn6z1x2agsnSTe80VbPEIFjJX50HghklUhe5fw0d48GGiRIL9HrLgF2hbiTxlUGaGtZSbizX63T1Rgtlw3Ahsh5JZXQRzry5LeQg3oW958TnpJ1r_7tVbSMfKxCqwhdhzx5qqEwzJj7ThEW2ygwllzs6bcf3qhvu-yySDO0MPn8q8S4E0P2xKXL5eFObDlXlaaA5AkkM2qlH_p"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent"></div>
+<div class="absolute top-2 left-2 flex gap-1">
+<div class="w-6 h-6 bg-secondary-container rounded-sm flex items-center justify-center border border-primary/30">
+<span class="material-symbols-outlined text-[14px] text-white" style="font-variation-settings: 'FILL' 1;">shield</span>
+</div>
+</div>
+</div>
+<div class="p-3">
+<p class="font-label-bold text-label-bold text-primary mb-1 uppercase tracking-tighter">Tank / Fighter</p>
+<h3 class="font-headline-md text-headline-md text-on-surface truncate">Gatotkaca</h3>
+</div>
+<!-- Decorative Batik Corner -->
+<div class="absolute bottom-0 right-0 w-8 h-8 opacity-20 pointer-events-none">
+<svg class="text-primary" fill="currentColor" viewbox="0 0 100 100">
+<path d="M100 0 L100 100 L0 100 Z"></path>
+</svg>
+</div>
+</div>
+</div>
+<!-- Hero Card: Kadita -->
+<div class="relative group">
+<div class="hero-card-clip bg-surface-container border border-primary/20 overflow-hidden gold-glow transition-transform duration-300 active:scale-95">
+<div class="h-48 relative">
+<img class="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-500" data-alt="A mystical Indonesian sea queen goddess inspired by Kadita, emerging from crashing emerald waves. She wears intricate jade and gold royal ornaments with flowy silken fabrics. The atmosphere is ethereal and majestic, featuring glowing sea foam and dramatic moonlight. Digital painting style with rich aquatic colors and glowing magical accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBr5XMnLXmFd1Pu76brta2SGFGYYrYLS0sWVbMuCHhsNahUlINIj9d5gmKhEh6LWgOQpRb-qvER9z3vhmmMfMrZ6WaF1sRZzHbT7-XCTEtb1TDnFiXCuX9kftwchxvupX7mJ6gypCbB6vmqNcHfIEeCSoWofYbOzA75FTnNNn0d8xlPMIWDN7ajb8yb1P3pM1cOXSTC_xHBJQ5jDV8glOaKUOl6p6bRJjwhkUnagXL6nWiCW1aejNz3U55VwGmcrNA1TWUucO2OHXzm"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent"></div>
+<div class="absolute top-2 left-2 flex gap-1">
+<div class="w-6 h-6 bg-secondary-container rounded-sm flex items-center justify-center border border-primary/30">
+<span class="material-symbols-outlined text-[14px] text-white" style="font-variation-settings: 'FILL' 1;">auto_fix_high</span>
+</div>
+</div>
+</div>
+<div class="p-3">
+<p class="font-label-bold text-label-bold text-primary mb-1 uppercase tracking-tighter">Mage / Assassin</p>
+<h3 class="font-headline-md text-headline-md text-on-surface truncate">Kadita</h3>
+</div>
+<div class="absolute bottom-0 right-0 w-8 h-8 opacity-20 pointer-events-none">
+<svg class="text-primary" fill="currentColor" viewbox="0 0 100 100">
+<path d="M100 0 L100 100 L0 100 Z"></path>
+</svg>
+</div>
+</div>
+</div>
+<!-- Hero Card: Lapu-Lapu -->
+<div class="relative group">
+<div class="hero-card-clip bg-surface-container border border-primary/20 overflow-hidden gold-glow transition-transform duration-300 active:scale-95">
+<div class="h-48 relative">
+<img class="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-500" data-alt="A fierce tribal warrior chieftain standing in a tropical jungle clearing at dusk, holding massive heavy twin blades. He has intricate tattoos and wears primitive yet ornate armor. The lighting is warm from a nearby fire, creating deep shadows and highlighting his muscular physique. High-fidelity cinematic game art style with vibrant earth tones and sharp details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvmWGgF1CyxGd7RCiGswjEaZW3GZJJl9NvVGsw_Fpk7uBja-u9ciU4vAMDGgHBvNmVtYXlIBBu3N_vPEsysKszvSdeWcGkJtBKZBdABTp5E807vJ6irVg-VRDLpqm_iYzpUfbNg8VsPtk0A00CTs1uBVCtlXYSBYiTuIy_mpZUOCYwCc31cjQqgKA_QcJMq54PLKTnLq0_O7bZPUSRyY7lWrt14jO4zZBX7_6g36C1wOCbe61ZSLJnQ-1gDetHg9Z7fZHsML_ymvT3"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent"></div>
+<div class="absolute top-2 left-2 flex gap-1">
+<div class="w-6 h-6 bg-secondary-container rounded-sm flex items-center justify-center border border-primary/30">
+<span class="material-symbols-outlined text-[14px] text-white" style="font-variation-settings: 'FILL' 1;">swords</span>
+</div>
+</div>
+</div>
+<div class="p-3">
+<p class="font-label-bold text-label-bold text-primary mb-1 uppercase tracking-tighter">Fighter</p>
+<h3 class="font-headline-md text-headline-md text-on-surface truncate">Lapu-Lapu</h3>
+</div>
+<div class="absolute bottom-0 right-0 w-8 h-8 opacity-20 pointer-events-none">
+<svg class="text-primary" fill="currentColor" viewbox="0 0 100 100">
+<path d="M100 0 L100 100 L0 100 Z"></path>
+</svg>
+</div>
+</div>
+</div>
+<!-- Hero Card: Chou -->
+<div class="relative group">
+<div class="hero-card-clip bg-surface-container border border-primary/20 overflow-hidden gold-glow transition-transform duration-300 active:scale-95">
+<div class="h-48 relative">
+<img class="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-500" data-alt="A master martial artist in a dynamic kung fu pose, wearing a modern tech-wear outfit with traditional embroidery accents. He is set against a neon-lit urban background with rain. The image has a fast-paced, high-energy feeling with motion blur and sharp focal points on his striking stance. Futuristic aesthetic with a touch of heritage style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6IpBQv2tKXFhGypqG2bRxBBwAl4hXLKYM6K9TAaEv-4ZBSNkTd1zZQDVLiy59IxwahCJ9p8u7Rcqs2LitmJKEOJx81wHVF033jY8PeXrEe_Y3bOsncsUbouHKxTVXz_gWLEaZ2dWR43aKLTpyZsNxQ0meX10pMSEPTb5iqML2wFav8vSmsQm97gaoZZlMx7poxm84ZPl7j5S6aL2pqFEvCK28O6mAj0Iz0P6ZxnKt3sWnIQjicwtpgvc3LDN6OlHaAKB8tMEavnsH"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent"></div>
+<div class="absolute top-2 left-2 flex gap-1">
+<div class="w-6 h-6 bg-secondary-container rounded-sm flex items-center justify-center border border-primary/30">
+<span class="material-symbols-outlined text-[14px] text-white" style="font-variation-settings: 'FILL' 1;">sports_martial_arts</span>
+</div>
+</div>
+</div>
+<div class="p-3">
+<p class="font-label-bold text-label-bold text-primary mb-1 uppercase tracking-tighter">Fighter</p>
+<h3 class="font-headline-md text-headline-md text-on-surface truncate">Chou</h3>
+</div>
+<div class="absolute bottom-0 right-0 w-8 h-8 opacity-20 pointer-events-none">
+<svg class="text-primary" fill="currentColor" viewbox="0 0 100 100">
+<path d="M100 0 L100 100 L0 100 Z"></path>
+</svg>
+</div>
+</div>
+</div>
+<!-- Hero Card: Badang -->
+<div class="relative group">
+<div class="hero-card-clip bg-surface-container border border-primary/20 overflow-hidden gold-glow transition-transform duration-300 active:scale-95">
+<div class="h-48 relative">
+<img class="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-500" data-alt="A legendary Malay warrior with massive golden gauntlets, inspired by Badang. He is standing before a rocky cliffside, muscles tensed for battle. The lighting is cinematic, with a golden hour glow reflecting off his metallic arms. Rich textures of stone and skin, with a majestic, disciplined warrior vibe. Epic fantasy digital illustration style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDakpf-fLPRtpdn8aV1IPB5uPEy1sBnsLr_j-oLEhuEmb4OPQcddN66j5VxQ3gTky2TrkhB12xfDCjSpPy2aIzF83LirTAshMskJC4BZxzuMnk2qzND02eP1ANimRQrTEsGT2bDKkvaGmJTxjTyTMgDB6r8pbCffPKqPlodFJjfjzhfAoOmNVCwi1xhWh4hrXdk8Hj9gHaTun8cwBq5_sI0HYWfoAi39F0ocHPu-kHsz2lT47cNMTBeiShBKBjXxHjubzWFwPK0JIjv"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent"></div>
+<div class="absolute top-2 left-2 flex gap-1">
+<div class="w-6 h-6 bg-secondary-container rounded-sm flex items-center justify-center border border-primary/30">
+<span class="material-symbols-outlined text-[14px] text-white" style="font-variation-settings: 'FILL' 1;">fitness_center</span>
+</div>
+</div>
+</div>
+<div class="p-3">
+<p class="font-label-bold text-label-bold text-primary mb-1 uppercase tracking-tighter">Fighter</p>
+<h3 class="font-headline-md text-headline-md text-on-surface truncate">Badang</h3>
+</div>
+<div class="absolute bottom-0 right-0 w-8 h-8 opacity-20 pointer-events-none">
+<svg class="text-primary" fill="currentColor" viewbox="0 0 100 100">
+<path d="M100 0 L100 100 L0 100 Z"></path>
+</svg>
+</div>
+</div>
+</div>
+<!-- Hero Card: Minsitthar -->
+<div class="relative group">
+<div class="hero-card-clip bg-surface-container border border-primary/20 overflow-hidden gold-glow transition-transform duration-300 active:scale-95">
+<div class="h-48 relative">
+<img class="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-500" data-alt="A royal king hero in ornate golden armor, wielding a long spear and a golden shield. The background features ancient temple stone carvings (Candi) and lush tropical foliage. The aesthetic is regal and disciplined, with bright sunbeams filtering through the trees, glinting off his polished gold gear. Masterful digital concept art style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzJgNL0JT05Kh9F7O_a4TqZ4_heIeYRHmtB5Y5Qi3t5xyoK9qc2pb43CldPBIcTgBpKRuvr_mN7cPBWWvLvkIWuXUWm-gZHnfr3J0l-3n3Ibtvhn0lLS731102TqGrQsur9ZHanvEUjtrPWH0SSaWSAA5Q9iFIv7uAOF4yutFdHOX9535t_el42TM4PnwB7_aZ0DDlp6W1YwNEW6L7d9vdBwoFR3FeR8RTHI-5V-NMQ2vSe4rcdxN3qlmJb3LqMBw04f7t6qB8k0VP"/>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container via-transparent to-transparent"></div>
+<div class="absolute top-2 left-2 flex gap-1">
+<div class="w-6 h-6 bg-secondary-container rounded-sm flex items-center justify-center border border-primary/30">
+<span class="material-symbols-outlined text-[14px] text-white" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+</div>
+</div>
+<div class="p-3">
+<p class="font-label-bold text-label-bold text-primary mb-1 uppercase tracking-tighter">Fighter</p>
+<h3 class="font-headline-md text-headline-md text-on-surface truncate">Minsitthar</h3>
+</div>
+<div class="absolute bottom-0 right-0 w-8 h-8 opacity-20 pointer-events-none">
+<svg class="text-primary" fill="currentColor" viewbox="0 0 100 100">
+<path d="M100 0 L100 100 L0 100 Z"></path>
+</svg>
+</div>
+</div>
+</div>
+</section>
+<!-- Decorative Footer -->
+<div class="mt-xl flex flex-col items-center opacity-30">
+<svg class="w-24 h-12 text-primary" viewbox="0 0 100 50">
+<path d="M0 50 Q 50 0 100 50 L 100 50 L 0 50 Z" fill="currentColor" fill-opacity="0.2"></path>
+<path d="M20 50 Q 50 20 80 50" fill="none" stroke="currentColor" stroke-width="2"></path>
+</svg>
+<p class="font-label-bold text-label-bold mt-2">DILINDUNGI OLEH LELUHUR</p>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 h-20 bg-surface-container-low/90 backdrop-blur-md border-t border-primary/20 rounded-t-xl shadow-[0_-4px_10px_rgba(0,0,0,0.5)]">
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:bg-surface-variant/20 transition-all" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="font-label-bold text-label-bold mt-1">Tourney</span>
+</a>
+<a class="relative flex flex-col items-center justify-center text-primary font-bold border-t-2 border-primary pt-2 active-tab-glow scale-110 transition-transform duration-300" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">shield</span>
+<span class="font-label-bold text-label-bold mt-1">Heroes</span>
+<div class="absolute -top-[2px] left-1/2 -translate-x-1/2 w-8 h-8 bg-primary/20 blur-xl rounded-full"></div>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant pt-2 hover:bg-surface-variant/20 transition-all" href="#">
+<span class="material-symbols-outlined">event_available</span>
+<span class="font-label-bold text-label-bold mt-1">Schedule</span>
+</a>
+</nav>
+<script>
+        // Micro-interaction for filter buttons
+        document.querySelectorAll('button.flex-shrink-0').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active classes
+                document.querySelectorAll('button.flex-shrink-0').forEach(b => {
+                    b.classList.remove('bg-primary', 'text-on-primary-container');
+                    b.classList.add('bg-surface-container-highest', 'text-on-surface-variant');
+                });
+                // Add active to clicked
+                this.classList.remove('bg-surface-container-highest', 'text-on-surface-variant');
+                this.classList.add('bg-primary', 'text-on-primary-container');
+            });
+        });
+
+        // Add subtle parallax effect to hero cards on scroll
+        window.addEventListener('scroll', () => {
+            const cards = document.querySelectorAll('.hero-card-clip img');
+            cards.forEach(img => {
+                const rect = img.getBoundingClientRect();
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    const shift = (rect.top / window.innerHeight) * 10;
+                    img.style.transform = `translateY(${shift}px) scale(1.05)`;
+                }
+            });
+        });
+    </script>
+</body></html>

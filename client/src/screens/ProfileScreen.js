@@ -9,11 +9,11 @@ const ProfileScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>My Profile</Text>
-      
+
       <View style={styles.card}>
         <Text style={styles.label}>Name</Text>
         <Text style={styles.value}>{userInfo?.name || 'Player'}</Text>
-        
+
         <Text style={styles.label}>Points / Coins</Text>
         <Text style={styles.value}>{userInfo?.coins || 0} P</Text>
       </View>

@@ -1,41 +1,73 @@
-// src/theme/theme.js
+import { Platform } from 'react-native';
 
 export const PALETTE = {
-  // ── Backgrounds ────────────────────────────────────────────────────────────
-  black: '#080B14',         // Primary background (deep navy)
-  darkGray: '#0F1320',      // Card / elevated surface
-  surface: '#0F1320',       // Alias — elevated cards
-  surface2: '#161B2E',      // Secondary surface (modals, headers)
-  lightGray: '#1E2540',     // Border / divider
+  // Brand Colors
+  primary: '#f2ca50',       // Gold/Brass (Pusaka Gold)
+  secondary: '#d4af37',     // Darker Gold for accents
+  tertiary: '#8c6b23',      // Even darker for depth
+  accent: '#f2ca50',
+  accentDim: 'rgba(242, 202, 80, 0.12)',
 
-  // ── Text ───────────────────────────────────────────────────────────────────
-  textMain: '#EAEDF6',      // Primary text (cool white)
-  textMuted: '#6B7394',     // Secondary / muted text
-  textDark: '#3A4168',      // Very dim labels
+  // Surface Colors
+  background: '#121212',    // Deep Charcoal/Black
+  surface: '#1e1e1e',       // Card Background
+  surfaceDim: '#181818',
+  surfaceContainerLowest: '#0d0d0d',
+  surfaceContainerLow: '#141414',
+  surfaceContainer: '#1c1c1c',
+  surfaceContainerHigh: '#2b2b2b',
+  surfaceContainerHighest: '#333535',
 
-  // ── Accents ────────────────────────────────────────────────────────────────
-  accent: '#00D4FF',        // Primary accent (electric cyan)
-  accentDim: 'rgba(0,212,255,0.12)',  // Accent tinted bg
-  gold: '#FFB800',          // Trophy / rank gold
-  redNeon: '#FF3B5C',       // Danger / live / CTA (vivid rose)
-  redNeonDim: 'rgba(255,59,92,0.12)', // Red tinted bg
-  blueInfo: '#60A5FA',      // Info / series labels
+  // Text Colors
+  onPrimary: '#121212',     // Dark text on Gold
+  onSecondary: '#121212',
+  onSurface: '#e2e2e2',     // Off-white text on dark
+  onSurfaceVariant: '#a0a0a0', // Muted text
 
-  // ── Semantic ───────────────────────────────────────────────────────────────
-  win: '#34D399',           // Win stat green
-  loss: '#F87171',          // Loss stat red
-  goldRank: '#FFD700',      // 1st place
-  silverRank: '#A8A8A8',    // 2nd place
-  bronzeRank: '#CD7F32',    // 3rd place
+  // Borders & Dividers
+  outline: '#4a4a4a',
+  outlineVariant: '#2a2a2a',
+
+  // Semantic
+  error: '#ef4444',
+  errorContainer: '#7f1d1d',
+  onError: '#ffffff',
+  onErrorContainer: '#fecaca',
+  success: '#22c55e',
+  win: '#22c55e',
+  loss: '#ef4444',
+  
+  // Backwards compat for old components that haven't been updated yet
+  textMain: '#e2e2e2',
+  textMuted: '#a0a0a0',
+  textDark: '#888888',
+  lightGray: '#2a2a2a',
+  black: '#121212',
+  surface2: '#1e1e1e',
 };
 
-// ── ANGULAR DESIGN SYSTEM ────────────────────────────────────────────────────
-// Sharp, boxy, esports-military aesthetic — minimal rounding
-export const SIZES = {
-  radiusL: 3,       // Large containers — nearly square
-  radiusM: 2,       // Cards, inputs
-  radiusS: 1,       // Badges, pills, tags
-  padding: 20,
+export const TYPOGRAPHY = {
+  displayLg: { fontFamily: 'Oswald_700Bold', fontSize: 57, lineHeight: 64 },
+  displayMd: { fontFamily: 'Oswald_700Bold', fontSize: 45, lineHeight: 52 },
+  displaySm: { fontFamily: 'Oswald_700Bold', fontSize: 36, lineHeight: 44 },
+  
+  headlineLg: { fontFamily: 'Oswald_700Bold', fontSize: 32, lineHeight: 40 },
+  headlineMd: { fontFamily: 'Oswald_700Bold', fontSize: 28, lineHeight: 36 },
+  headlineSm: { fontFamily: 'Oswald_700Bold', fontSize: 24, lineHeight: 32 },
+  
+  titleLg: { fontFamily: 'Oswald_700Bold', fontSize: 22, lineHeight: 28 },
+  titleMd: { fontFamily: 'Oswald_600SemiBold', fontSize: 16, lineHeight: 24, letterSpacing: 0.15 },
+  titleSm: { fontFamily: 'Oswald_500Medium', fontSize: 14, lineHeight: 20, letterSpacing: 0.1 },
+  
+  bodyLg: { fontFamily: 'Inter_400Regular', fontSize: 16, lineHeight: 24, letterSpacing: 0.5 },
+  bodyMd: { fontFamily: 'Inter_400Regular', fontSize: 14, lineHeight: 20, letterSpacing: 0.25 },
+  bodySm: { fontFamily: 'Inter_400Regular', fontSize: 12, lineHeight: 16, letterSpacing: 0.4 },
+  
+  labelLg: { fontFamily: 'Inter_500Medium', fontSize: 14, lineHeight: 20, letterSpacing: 0.1 },
+  labelBold: { fontFamily: 'Inter_700Bold', fontSize: 12, lineHeight: 16, letterSpacing: 0.5 },
+  labelSmall: { fontFamily: 'Inter_600SemiBold', fontSize: 11, lineHeight: 16, letterSpacing: 0.5 },
+
+  statValue: { fontFamily: 'Oswald_700Bold', fontSize: 24, lineHeight: 32, letterSpacing: 1 },
 };
 
 export const SPACING = {
@@ -44,31 +76,33 @@ export const SPACING = {
   md: 16,
   lg: 24,
   xl: 32,
+  xxl: 48,
+  marginMobile: 16,
+  marginWeb: 40,
 };
 
-export const FONT_SIZES = {
-  xs: 8,
-  sm: 10,
-  md: 12,
-  lg: 14,
-  xl: 18,
-  xxl: 24,
-  hero: 40,
+export const SIZES = {
+  radiusNone: 0,
+  radiusSm: 4,
+  radiusBase: 8,
+  radiusLg: 12,
+  radiusXl: 16,
+  radiusFull: 9999,
 };
 
 export const SHADOWS = {
-  cardGlow: {
-    shadowColor: '#00D4FF',
-    shadowOpacity: 0.08,
+  goldGlow: {
+    shadowColor: PALETTE.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
     shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 6,
-  },
-  elevated: {
-    shadowColor: '#000',
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
     elevation: 8,
   },
+  card: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  }
 };

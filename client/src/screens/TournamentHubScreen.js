@@ -88,11 +88,11 @@ const TournamentHubScreen = () => {
 
   const formatTime = (isoString) => {
     const date = new Date(isoString);
-    
+
     const now = new Date();
     const jakartaMatchDate = date.toLocaleDateString('en-US', { timeZone: 'Asia/Jakarta' });
     const jakartaToday = now.toLocaleDateString('en-US', { timeZone: 'Asia/Jakarta' });
-    
+
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
     const jakartaTomorrow = tomorrow.toLocaleDateString('en-US', { timeZone: 'Asia/Jakarta' });
@@ -118,7 +118,7 @@ const TournamentHubScreen = () => {
 
     const podium = [
       { team: top3[1] || null, rank: 2 },
-      { team: top3[0],          rank: 1 },
+      { team: top3[0], rank: 1 },
       { team: top3[2] || null, rank: 3 },
     ];
 
@@ -190,7 +190,7 @@ const TournamentHubScreen = () => {
             <View style={styles.regionBadge}><Text style={styles.regionBadgeText}>{selectedRegion.id}</Text></View>
           </TouchableOpacity>
         </View>
-        
+
         <View style={styles.heroTextContainer}>
           {/* Phase badge — shows PLAYOFFS or REGULAR SEASON dynamically */}
           <View style={styles.phaseBadgeRow}>
@@ -303,7 +303,7 @@ const TournamentHubScreen = () => {
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 50 }}>
         {renderHeader()}
-        
+
         {isWeb ? (
           <View style={styles.webTwoPane}>
             <View style={styles.webLeftPane}>
@@ -347,8 +347,8 @@ const TournamentHubScreen = () => {
             <View style={styles.modalAccentBar} />
             <Text style={styles.modalTitle}>SWITCH REGION</Text>
             {REGIONS.map((region) => (
-              <TouchableOpacity 
-                key={region.id} 
+              <TouchableOpacity
+                key={region.id}
                 style={[styles.regionItem, selectedRegion.id === region.id && styles.selectedRegionItem]}
                 onPress={() => {
                   setSelectedRegion(region);
@@ -482,11 +482,11 @@ const styles = StyleSheet.create({
     backgroundColor: PALETTE.surface2,
     borderBottomWidth: 2, borderBottomColor: PALETTE.accent + '30',
   },
-  tableHeadRank:  { color: PALETTE.textDark, fontSize: 9, fontWeight: '900', width: 28, letterSpacing: 1 },
-  tableHeadLogo:  { width: 28, marginRight: 10 },
+  tableHeadRank: { color: PALETTE.textDark, fontSize: 9, fontWeight: '900', width: 28, letterSpacing: 1 },
+  tableHeadLogo: { width: 28, marginRight: 10 },
   tableHeadLabel: { color: PALETTE.textDark, fontSize: 9, fontWeight: '800', letterSpacing: 2 },
-  tableHeadStat:  { color: PALETTE.textDark, fontSize: 9, fontWeight: '800', width: 28, textAlign: 'right', letterSpacing: 1 },
-  tableHeadStatGW:{ color: PALETTE.textDark, fontSize: 9, fontWeight: '800', width: 32, textAlign: 'right', letterSpacing: 1 },
+  tableHeadStat: { color: PALETTE.textDark, fontSize: 9, fontWeight: '800', width: 28, textAlign: 'right', letterSpacing: 1 },
+  tableHeadStatGW: { color: PALETTE.textDark, fontSize: 9, fontWeight: '800', width: 32, textAlign: 'right', letterSpacing: 1 },
 
   tableRow: {
     flexDirection: 'row', alignItems: 'center',

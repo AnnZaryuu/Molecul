@@ -38,4 +38,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/admin/users/{id}/coins', [AdminController::class, 'updateCoins']);
     Route::delete('/admin/users/{id}', [AdminController::class, 'deleteUser']);
     Route::post('/admin/dummy-matches', [AdminController::class, 'createDummyMatch']);
+    Route::delete('/admin/dummy-matches/{id}', [AdminController::class, 'deleteDummyMatch']);
 });

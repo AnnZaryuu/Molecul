@@ -114,6 +114,18 @@ const AdminDashboardScreen = ({ navigation }) => {
     setIsLoading(false);
   };
 
+  const handleDeleteDummyMatch = async (id) => {
+    setIsLoading(true);
+    try {
+      await api.delete(`/admin/dummy-matches/${id}`);
+      showNotify('Dummy match dihapus.', 'success');
+      fetchMatches();
+    } catch (error) {
+      showNotify(error.response?.data?.message || 'Gagal menghapus dummy match.', 'error');
+    }
+    setIsLoading(false);
+  };
+
   const handleDeleteUser = async (id) => {
     try {
       await api.delete(`/admin/users/${id}`);
@@ -195,19 +207,28 @@ const AdminDashboardScreen = ({ navigation }) => {
             </TouchableOpacity>
 
             {isLoading ? <ActivityIndicator color={PALETTE.redNeon} /> : matches.map((match) => (
-              <TouchableOpacity 
-                key={match.id} 
-                style={[styles.matchCard, match.isDummy && { borderColor: PALETTE.accent }]}
-                onPress={() => {
-                  setSelectedMatch(match);
-                  setShowResolveModal(true);
-                }}
-              >
-                <Text style={styles.matchName}>{match.name} {match.isDummy ? '(DUMMY)' : ''}</Text>
-                <Text style={styles.matchTeams}>
-                  {match.opponents?.[0]?.name || 'TBD'} vs {match.opponents?.[1]?.name || 'TBD'}
-                </Text>
-              </TouchableOpacity>
+              <View key={match.id} style={{ flexDirection: 'row', alignItems: 'stretch', marginBottom: 10 }}>
+                <TouchableOpacity 
+                  style={[styles.matchCard, match.isDummy && { borderColor: PALETTE.accent }, { flex: 1, marginBottom: 0 }]}
+                  onPress={() => {
+                    setSelectedMatch(match);
+                    setShowResolveModal(true);
+                  }}
+                >
+                  <Text style={styles.matchName}>{match.name} {match.isDummy ? '(DUMMY)' : ''}</Text>
+                  <Text style={styles.matchTeams}>
+                    {match.opponents?.[0]?.name || 'TBD'} vs {match.opponents?.[1]?.name || 'TBD'}
+                  </Text>
+                </TouchableOpacity>
+                {match.isDummy && (
+                  <TouchableOpacity 
+                    style={{ paddingHorizontal: 16, justifyContent: 'center', backgroundColor: '#1e1e1e', borderWidth: 1, borderColor: PALETTE.lightGray, marginLeft: 8 }}
+                    onPress={() => handleDeleteDummyMatch(match.id)}
+                  >
+                    <Ionicons name="trash-outline" size={20} color={PALETTE.redNeon} />
+                  </TouchableOpacity>
+                )}
+              </View>
             ))}
           </View>
         )}

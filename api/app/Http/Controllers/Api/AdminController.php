@@ -119,4 +119,16 @@ class AdminController extends Controller
         $user->delete();
         return response()->json(['message' => 'User deleted successfully']);
     }
+
+    public function deleteDummyMatch(Request $request, $id)
+    {
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $match = DummyMatch::findOrFail($id);
+        $match->delete();
+
+        return response()->json(['message' => 'Dummy match deleted successfully']);
+    }
 }

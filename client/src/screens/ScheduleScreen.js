@@ -134,10 +134,10 @@ const ScheduleScreen = () => {
         serie: 'TEST SERIES',
         matchType: 'BO3',
         numberOfGames: 3,
-        results: [{score: 0}, {score: 0}],
+        results: [{ score: 0 }, { score: 0 }],
         opponents: [
-          { id: d.team_a_id, name: d.team_a_name, acronym: d.team_a_name.substring(0,4).toUpperCase() },
-          { id: d.team_b_id, name: d.team_b_name, acronym: d.team_b_name.substring(0,4).toUpperCase() }
+          { id: d.team_a_id, name: d.team_a_name, acronym: d.team_a_name.substring(0, 4).toUpperCase() },
+          { id: d.team_b_id, name: d.team_b_name, acronym: d.team_b_name.substring(0, 4).toUpperCase() }
         ]
       }));
 
@@ -145,12 +145,12 @@ const ScheduleScreen = () => {
       filteredUpcoming = [...dummyMatches, ...filteredUpcoming];
 
       if (selectedRegion.id !== 'ALL') {
-        filteredLive = filteredLive.filter(m => 
-          m.league?.toUpperCase().includes(selectedRegion.id) || 
+        filteredLive = filteredLive.filter(m =>
+          m.league?.toUpperCase().includes(selectedRegion.id) ||
           m.league?.toUpperCase().includes(selectedRegion.name)
         );
-        filteredUpcoming = filteredUpcoming.filter(m => 
-          m.league?.toUpperCase().includes(selectedRegion.id) || 
+        filteredUpcoming = filteredUpcoming.filter(m =>
+          m.league?.toUpperCase().includes(selectedRegion.id) ||
           m.league?.toUpperCase().includes(selectedRegion.name)
         );
       }
@@ -165,11 +165,11 @@ const ScheduleScreen = () => {
 
   const formatTime = (isoString) => {
     const date = new Date(isoString);
-    
+
     const now = new Date();
     const jakartaMatchDate = date.toLocaleDateString('en-US', { timeZone: 'Asia/Jakarta' });
     const jakartaToday = now.toLocaleDateString('en-US', { timeZone: 'Asia/Jakarta' });
-    
+
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
     const jakartaTomorrow = tomorrow.toLocaleDateString('en-US', { timeZone: 'Asia/Jakarta' });
@@ -191,10 +191,10 @@ const ScheduleScreen = () => {
     const opponents = match.opponents || [];
     const teamA = opponents[0];
     const teamB = opponents[1];
-    
+
     const teamAName = teamA?.name || 'TBD';
     const teamBName = teamB?.name || 'TBD';
-    
+
     const teamALogo = TEAM_LOGOS[teamA?.acronym] ? TEAM_LOGOS[teamA?.acronym] : (teamA?.logo ? { uri: teamA.logo } : { uri: `https://placehold.co/60/222/white?text=${teamA?.acronym || '?'}` });
     const teamBLogo = TEAM_LOGOS[teamB?.acronym] ? TEAM_LOGOS[teamB?.acronym] : (teamB?.logo ? { uri: teamB.logo } : { uri: `https://placehold.co/60/222/white?text=${teamB?.acronym || '?'}` });
 
@@ -260,7 +260,7 @@ const ScheduleScreen = () => {
         {(() => {
           if (isLive) {
             return (
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.watchBtn}
                 onPress={() => {
                   const url = match.streamUrl || `https://www.youtube.com/results?search_query=${encodeURIComponent(match.name + ' MLBB Live')}`;
@@ -412,8 +412,8 @@ const ScheduleScreen = () => {
             <View style={styles.modalAccentBar} />
             <Text style={styles.modalTitle}>FILTER REGION</Text>
             {REGIONS.map((region) => (
-              <TouchableOpacity 
-                key={region.id} 
+              <TouchableOpacity
+                key={region.id}
                 style={[styles.regionItem, selectedRegion.id === region.id && styles.selectedRegionItem]}
                 onPress={() => {
                   setSelectedRegion(region);
@@ -439,7 +439,7 @@ const ScheduleScreen = () => {
           <View style={styles.modalContent}>
             <View style={[styles.modalAccentBar, { backgroundColor: PALETTE.redNeon }]} />
             <Text style={styles.modalTitle}>{existingPredictionForModal ? 'ADD WAGER' : 'PREDICT MATCH'}</Text>
-            
+
             {selectedMatch && (
               <View>
                 <Text style={styles.predictSubtitle}>{existingPredictionForModal ? 'Locked winner (from previous prediction):' : 'Select winner:'}</Text>
@@ -473,7 +473,7 @@ const ScheduleScreen = () => {
                   value={wager}
                   onChangeText={setWager}
                 />
-                
+
                 <TouchableOpacity
                   style={[styles.predictSubmitBtn, predictLoading && { opacity: 0.5 }]}
                   onPress={handlePredict}
@@ -523,7 +523,7 @@ const styles = StyleSheet.create({
   sectionTitleWrap: { flexDirection: 'row', alignItems: 'center', gap: 10, marginHorizontal: 20, marginBottom: 14 },
   sectionAccentBar: { width: 3, height: 16, backgroundColor: PALETTE.accent },
   sectionTitle: { color: PALETTE.textMain, fontSize: 11, fontWeight: '900', letterSpacing: 2, opacity: 0.5 },
-  
+
   // ── Grid (Web) ─────────────────────────────────────────────────────────────
   gridContainer: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 10 },
 
@@ -538,7 +538,7 @@ const styles = StyleSheet.create({
   cardAccentLeft: { position: 'absolute', top: 0, left: 0, width: 3, height: '100%' },
 
   liveBorder: { borderColor: PALETTE.redNeon + '60' },
-  
+
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, marginLeft: 8 },
   leagueInfo: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   leagueLogo: { width: 16, height: 16, borderRadius: 0 },
@@ -598,7 +598,7 @@ const styles = StyleSheet.create({
   selectedRegionItemText: { color: PALETTE.textMain },
   closeBtn: { marginTop: 24, paddingVertical: 10, borderWidth: 1, borderColor: PALETTE.lightGray },
   closeBtnText: { color: PALETTE.textDark, fontSize: 11, fontWeight: '900', textAlign: 'center', letterSpacing: 2 },
-  
+
   predictSubtitle: { color: PALETTE.textMuted, fontSize: 11, fontWeight: '800', marginBottom: 10, letterSpacing: 1 },
   predictTeamRow: { flexDirection: 'row', gap: 10, marginBottom: 20 },
   predictTeamBtn: { flex: 1, paddingVertical: 12, borderWidth: 1, borderColor: PALETTE.lightGray, alignItems: 'center' },
@@ -608,23 +608,23 @@ const styles = StyleSheet.create({
   predictInput: { backgroundColor: PALETTE.black, color: PALETTE.textMain, borderWidth: 1, borderColor: PALETTE.lightGray, padding: 12, marginBottom: 20, fontSize: 14, fontWeight: '800' },
   predictSubmitBtn: { backgroundColor: PALETTE.redNeon, paddingVertical: 14 },
   predictSubmitText: { color: 'white', textAlign: 'center', fontWeight: '900', fontSize: 12, letterSpacing: 1 },
-  
+
   notificationBox: { marginHorizontal: 20, marginBottom: 16, padding: 12, borderWidth: 1 },
   notificationSuccess: { backgroundColor: 'rgba(16, 185, 129, 0.15)', borderColor: '#10b981' },
   notificationError: { backgroundColor: 'rgba(255, 60, 60, 0.1)', borderColor: PALETTE.redNeon },
   notificationText: { fontSize: 12, textAlign: 'center', fontWeight: '900', letterSpacing: 1 },
   notificationTextSuccess: { color: '#10b981' },
   notificationTextError: { color: PALETTE.redNeon },
-  
+
   predictedBtn: { backgroundColor: 'rgba(16, 185, 129, 0.15)', borderColor: '#10b981', paddingVertical: 12, borderWidth: 1, marginTop: 16 },
   predictedText: { color: '#10b981', fontSize: 11, fontWeight: '900', textAlign: 'center', letterSpacing: 2 },
-  
+
   claimBtn: { backgroundColor: 'rgba(255, 215, 0, 0.15)', borderColor: '#FFD700', paddingVertical: 12, borderWidth: 1, marginTop: 16 },
   claimText: { color: '#FFD700', fontSize: 11, fontWeight: '900', textAlign: 'center', letterSpacing: 2 },
-  
+
   claimedBtn: { backgroundColor: 'transparent', borderColor: '#444', paddingVertical: 12, borderWidth: 1, marginTop: 16 },
   claimedText: { color: '#888', fontSize: 11, fontWeight: '900', textAlign: 'center', letterSpacing: 2 },
-  
+
   lostBtn: { backgroundColor: 'rgba(255, 60, 60, 0.1)', borderColor: PALETTE.redNeon, paddingVertical: 12, borderWidth: 1, marginTop: 16 },
   lostText: { color: PALETTE.redNeon, fontSize: 11, fontWeight: '900', textAlign: 'center', letterSpacing: 2 },
 });

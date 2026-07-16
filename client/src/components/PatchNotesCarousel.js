@@ -75,11 +75,11 @@ const PATCH_DATA = {
 
 // ── Patch Hero Card ───────────────────────────────────────────────────────────
 const PatchCard = ({ hero, delay, heroImageMap }) => {
-  const fade  = useRef(new Animated.Value(0)).current;
+  const fade = useRef(new Animated.Value(0)).current;
   const slide = useRef(new Animated.Value(16)).current;
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fade,  { toValue: 1, duration: 240, delay, useNativeDriver: true }),
+      Animated.timing(fade, { toValue: 1, duration: 240, delay, useNativeDriver: true }),
       Animated.timing(slide, { toValue: 0, duration: 240, delay, useNativeDriver: true }),
     ]).start();
   }, []);
@@ -210,11 +210,11 @@ export default function PatchNotesCarousel() {
 
 const s = StyleSheet.create({
   sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 20, paddingTop: 24, paddingBottom: 12 },
-  sectionAccent:   { width: 3, height: 24, backgroundColor: PALETTE.accent },
-  sectionTitle:    { color: PALETTE.textMain, fontSize: isWeb ? 17 : 14, fontWeight: '900', letterSpacing: 2 },
-  sectionSub:      { color: PALETTE.textDark, fontSize: 8, fontWeight: '800', letterSpacing: 1.5, marginTop: 2 },
+  sectionAccent: { width: 3, height: 24, backgroundColor: PALETTE.accent },
+  sectionTitle: { color: PALETTE.textMain, fontSize: isWeb ? 17 : 14, fontWeight: '900', letterSpacing: 2 },
+  sectionSub: { color: PALETTE.textDark, fontSize: 8, fontWeight: '800', letterSpacing: 1.5, marginTop: 2 },
 
-  patchRow:  { paddingHorizontal: 16, gap: 10, paddingBottom: 20 },
+  patchRow: { paddingHorizontal: 16, gap: 10, paddingBottom: 20 },
   patchCard: {
     position: 'relative',
     width: isWeb ? 260 : 230,
@@ -225,23 +225,23 @@ const s = StyleSheet.create({
     borderColor: PALETTE.lightGray,
   },
 
-  patchInfo:      { padding: 14, gap: 8 },
-  patchHeroName:  { color: PALETTE.textMain, fontSize: 14, fontWeight: '900', letterSpacing: 1 },
-  patchHeroRole:  { color: PALETTE.textMuted, fontSize: 9, fontWeight: '800', letterSpacing: 1.5, marginTop: -4 },
-  patchBadgeRow:  { flexDirection: 'row', gap: 6 },
-  buffBadge:      {
+  patchInfo: { padding: 14, gap: 8 },
+  patchHeroName: { color: PALETTE.textMain, fontSize: 14, fontWeight: '900', letterSpacing: 1 },
+  patchHeroRole: { color: PALETTE.textMuted, fontSize: 9, fontWeight: '800', letterSpacing: 1.5, marginTop: -4 },
+  patchBadgeRow: { flexDirection: 'row', gap: 6 },
+  buffBadge: {
     flexDirection: 'row', alignItems: 'center', gap: 3,
     backgroundColor: 'rgba(52,211,153,0.1)', borderWidth: 1, borderColor: 'rgba(52,211,153,0.25)',
     paddingHorizontal: 6, paddingVertical: 2, borderRadius: 0,   // ← SHARP
   },
-  nerfBadge:      {
+  nerfBadge: {
     flexDirection: 'row', alignItems: 'center', gap: 3,
     backgroundColor: 'rgba(248,113,113,0.1)', borderWidth: 1, borderColor: 'rgba(248,113,113,0.25)',
     paddingHorizontal: 6, paddingVertical: 2, borderRadius: 0,   // ← SHARP
   },
   patchBadgeText: { fontSize: 7, fontWeight: '900', letterSpacing: 1 },
-  patchChange:    { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
-  patchChangeIcon:{ width: 20, height: 20, borderRadius: 0, justifyContent: 'center', alignItems: 'center', marginTop: 1 },  // ← SHARP
+  patchChange: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
+  patchChangeIcon: { width: 20, height: 20, borderRadius: 0, justifyContent: 'center', alignItems: 'center', marginTop: 1 },  // ← SHARP
   patchSkillName: { color: PALETTE.textMain, fontSize: 10, fontWeight: '800', letterSpacing: 0.5 },
-  patchSkillDetail:{ color: PALETTE.textMuted, fontSize: 9, fontWeight: '600', marginTop: 1 },
+  patchSkillDetail: { color: PALETTE.textMuted, fontSize: 9, fontWeight: '600', marginTop: 1 },
 });

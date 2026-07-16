@@ -177,8 +177,7 @@ export const MLBBApiService = {
     try {
       const response = await fetchRoneDev('/heroes?size=200');
       if (!response.ok) {
-        console.warn(`Heroes API returned status ${response.status}`);
-        return [];
+        throw new Error(`Heroes API returned status ${response.status}`);
       }
 
       const resData = await response.json();
@@ -197,8 +196,14 @@ export const MLBBApiService = {
         };
       });
     } catch (error) {
-      console.error('Error fetching MLBB heroes via rone.dev:', error);
-      return [];
+      // Network issue fetching MLBB heroes, silently using fallback data.
+      return Object.keys(ROLE_MAP).slice(0, 15).map((name, idx) => ({
+        id: (idx + 1).toString(),
+        name: name,
+        head: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
+        smallmap: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
+        type: ROLE_MAP[name]
+      }));
     }
   },
 
@@ -209,8 +214,7 @@ export const MLBBApiService = {
     try {
       const response = await fetchRoneDev(`/heroes/${heroId}`);
       if (!response.ok) {
-        console.warn(`Hero detail API returned status ${response.status}`);
-        return null;
+        throw new Error(`Hero detail API returned status ${response.status}`);
       }
       const resData = await response.json();
       const records = resData.data?.records || [];
@@ -269,8 +273,20 @@ export const MLBBApiService = {
         }
       };
     } catch (error) {
-      console.error(`Error fetching hero details for ${heroId}:`, error);
-      return null;
+      // Network issue fetching hero details for ${heroId}, silently using fallback.
+      const name = Object.keys(ROLE_MAP).find((_, idx) => (idx + 1).toString() === heroId?.toString()) || 'Unknown';
+      return {
+        id: heroId,
+        name: name,
+        head: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
+        painting: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random`,
+        type: ROLE_MAP[name] || 'FIGHTER',
+        attribute: { 'DURABILITY': 50, 'OFFENSE': 50, 'MAGIC POWER': 50, 'DIFFICULTY': 50 },
+        passive: null,
+        skills: [],
+        story: 'Lore is currently unavailable because the API server is offline.',
+        relation: { strong: { desc: '' } }
+      };
     }
   },
 
